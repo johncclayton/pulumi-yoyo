@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34518.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pulumi-yoyo", "pulumi-yoyo\pulumi-yoyo.csproj", "{9298EEDC-68A6-4847-AB9C-27637270552D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "unittests", "unittests\unittests.csproj", "{FDE73A70-4B52-4CF4-BF54-7FFA30DC8531}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9298EEDC-68A6-4847-AB9C-27637270552D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9298EEDC-68A6-4847-AB9C-27637270552D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9298EEDC-68A6-4847-AB9C-27637270552D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9298EEDC-68A6-4847-AB9C-27637270552D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDE73A70-4B52-4CF4-BF54-7FFA30DC8531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDE73A70-4B52-4CF4-BF54-7FFA30DC8531}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDE73A70-4B52-4CF4-BF54-7FFA30DC8531}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDE73A70-4B52-4CF4-BF54-7FFA30DC8531}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {110EB5CF-0517-48EE-9755-4AAB3F6AB72F}
+	EndGlobalSection
+EndGlobal
