@@ -7,6 +7,11 @@ public record ProjectConfiguration(
     IList<StackConfig> Stacks
 )
 {
+    public static ProjectConfiguration? ReadFromFromFile(string yoyoProjectFile)
+    {
+        return ReadFromData(File.ReadAllText(yoyoProjectFile));
+    }
+
     public static ProjectConfiguration? ReadFromData(string data)
     {
         // json de-serialize
@@ -19,4 +24,5 @@ public record ProjectConfiguration(
         var directoryPath = Environment.DefaultDirectoryForEnvironment ?? Directory.GetCurrentDirectory();
         return Path.Combine(directoryPath, forStack.DirectoryPath);
     }
+
 }

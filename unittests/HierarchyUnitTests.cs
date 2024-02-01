@@ -26,16 +26,20 @@ public class HierarchyUnitTests
     public void TestCanIterateTheHierarchy()
     {
         // fetch a hierarchy iterator, and iterate it - we are looking for a specific flow...
-        var it = new CommandIterator(_projectConfiguration);
-        var commands = it.RunCommand((config, s) => true);
+        var it = new CommandIterator(_projectConfiguration ?? throw new InvalidOperationException());
+        var commands = it.GetHierarchyAsExecutionList();
+        
+        Assert.Equal(3, commands.Count);
         
         var first = commands.First();
-        Assert.Equal("cluster", first.Item1.ShortName);
+        Assert.Equal("cluster", first.ShortName);
         
         var second = commands.Skip(1).First();
-        Assert.Equal("mssql", second.Item1.ShortName);
+        Assert.Equal("mssql", second.ShortName);
         
         var third = commands.Skip(2).First();
-        Assert.Equal("app", third.Item1.ShortName);
+        Assert.Equal("app", third.ShortName);
+        
+        
     }
 }

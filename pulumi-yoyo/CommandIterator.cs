@@ -3,7 +3,8 @@ using pulumi_yoyo.config;
 
 namespace pulumi_yoyo;
 
-using Response = Tuple<StackConfig, Func<ProjectConfiguration, StackConfig, bool>> ;
+using ResponseWithFunc = Tuple<StackConfig, Func<ProjectConfiguration, StackConfig, bool>>;
+using Response = StackConfig;
 
 public class CommandIterator
 {
@@ -14,14 +15,13 @@ public class CommandIterator
 
     public ProjectConfiguration Configuration { get; set; }
 
-    public IList<Response> RunCommand(Func<ProjectConfiguration, StackConfig, bool> func)
+    public IList<Response> GetHierarchyAsExecutionList()
     {
         var response = new List<Response>();
-        return IterateStacks(response, Configuration.Stacks, func);
+        return IterateStacks(response, Configuration.Stacks);
     }
     
-    private IList<Response> IterateStacks(List<Response> response, IList<StackConfig> stacks,
-        Func<ProjectConfiguration, StackConfig, bool> func)
+    private IList<Response> IterateStacks(List<Response> response, IList<StackConfig> stacks)
     {
         // iterate the hierarchy, calling func() on each object.
         foreach (var oneStack in stacks)
@@ -36,17 +36,14 @@ public class CommandIterator
                     if (null != depStack)
                         dependentStacks.Add(depStack);
                 }
-
-                foreach (var theStack in dependentStacks)
-                {
-                    // if it is not in response already, add it
-                    if (response.All(x => x.Item1.ShortName != theStack.ShortName))
-                        response.Add(new Response(theStack, func));
-                }
+                
+                // recurse into the dependent stacks
+                IterateStacks(response, dependentStacks);
             }
             
-            // append the func to the stack...
-            response.Add(new Response(oneStack, func));
+            // if the oneStack is NOT in the response list, add it
+            if(response.All(x => x.ShortName != oneStack.ShortName))
+                response.Add(oneStack);
         }
 
         return response;
