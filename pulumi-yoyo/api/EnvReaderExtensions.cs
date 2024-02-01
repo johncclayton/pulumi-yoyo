@@ -1,6 +1,6 @@
 ﻿using dotenv.net.Utilities;
 
-namespace scan_pulumi;
+namespace pulumi_yoyo.api;
 
 public static class EnvReaderExtensions
 {

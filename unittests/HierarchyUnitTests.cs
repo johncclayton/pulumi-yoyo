@@ -26,10 +26,10 @@ public class HierarchyUnitTests
     public void TestCanIterateTheHierarchy()
     {
         // fetch a hierarchy iterator, and iterate it - we are looking for a specific flow...
-        var it = new CommandIterator(_projectConfiguration ?? throw new InvalidOperationException());
+        var it = new ConfigurationIterator(_projectConfiguration ?? throw new InvalidOperationException());
         var commands = it.GetHierarchyAsExecutionList();
         
-        Assert.Equal(3, commands.Count);
+        Assert.Equal(4, commands.Count);
         
         var first = commands.First();
         Assert.Equal("cluster", first.ShortName);
@@ -40,6 +40,8 @@ public class HierarchyUnitTests
         var third = commands.Skip(2).First();
         Assert.Equal("app", third.ShortName);
         
+        var last = commands.Skip(3).First();
+        Assert.Equal("lastapp", last.ShortName);
         
     }
 }

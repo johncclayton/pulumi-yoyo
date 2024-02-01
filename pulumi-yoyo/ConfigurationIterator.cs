@@ -3,12 +3,12 @@ using pulumi_yoyo.config;
 
 namespace pulumi_yoyo;
 
-using ResponseWithFunc = Tuple<StackConfig, Func<ProjectConfiguration, StackConfig, bool>>;
+// using ResponseWithFunc = Tuple<StackConfig, Func<ProjectConfiguration, StackConfig, bool>>;
 using Response = StackConfig;
 
-public class CommandIterator
+public class ConfigurationIterator
 {
-    public CommandIterator(ProjectConfiguration config)
+    public ConfigurationIterator(ProjectConfiguration config)
     {
         Configuration = config;
     }

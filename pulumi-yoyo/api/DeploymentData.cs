@@ -1,4 +1,4 @@
-﻿namespace scan_pulumi;
+﻿namespace pulumi_yoyo.api;
 
 public record ManifestData(string Time, string Magic, string Version);
 

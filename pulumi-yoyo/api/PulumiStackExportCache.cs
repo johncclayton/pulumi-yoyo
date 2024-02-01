@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
-using OneOf.Types;
 
-namespace scan_pulumi;
+namespace pulumi_yoyo.api;
 
 public class PulumiStackExportCache
 {

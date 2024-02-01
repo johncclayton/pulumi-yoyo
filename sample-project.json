@@ -1,7 +1,7 @@
 {
   "Environment": {
     "SubscriptionName": "wahaay",
-    "DefaultDirectoryForEnvironment": "monkey"
+    "DefaultDirectoryForEnvironment": "g:/soxes/quickstart/testing"
   },
   "Stacks": [
     {

@@ -1,6 +1,6 @@
 ﻿using Flurl.Http;
 
-namespace scan_pulumi;
+namespace pulumi_yoyo.api;
 
 public class PulumiServiceApiClient
 {

@@ -1,16 +1,36 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using CommandLine;
 using dotenv.net;
-using dotenv.net.Utilities;
 using pulumi_yoyo;
+using pulumi_yoyo.api;
 using pulumi_yoyo.config;
-using scan_pulumi;
 
 DotEnv.Fluent()
     .WithProbeForEnv(4)
     .WithTrimValues()
     .Load();
 
-var pulumiAccessToken = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ACCESS_TOKEN");
+var yoyoProjectFile = EnvReaderExtensions.GetOptionalStringValue("YOYO_PROJECT_PATH");
+if(yoyoProjectFile is null)
+{
+    Console.WriteLine("YOYO_PROJECT_PATH is not set - cannot continue.");
+    return;
+}
+
+if (!File.Exists(yoyoProjectFile))
+{
+    Console.WriteLine("The YOYO_PROJECT_PATH file does not exist - cannot continue.");
+    return;
+}
+
+Console.WriteLine($"Using project file at: {yoyoProjectFile}");
+var projectConfig = ProjectConfiguration.ReadFromFromFile(yoyoProjectFile);
+if (projectConfig is null)
+{
+    Console.WriteLine("The project file does not contain a valid project configuration - cannot continue.");
+    return;
+}
+
+// var pulumiAccessToken = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ACCESS_TOKEN");
 // var pulumiOrg = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ORG", "soxes");
 // if (pulumiAccessToken is null)
 // {
@@ -20,35 +40,20 @@ var pulumiAccessToken = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ACCES
 
 // var client = new PulumiServiceApiClient(pulumiAccessToken);
 
-// an idea... if you can walk up the tree, e.g. DOTNET-env style configuration, and find a YOYO_PROJECT_PATH file, read it. 
-var yoyoProjectFile = EnvReaderExtensions.GetOptionalStringValue("YOYO_PROJECT_PATH");
-if(yoyoProjectFile is null)
-{
-    Console.WriteLine("YOYO_PROJECT_PATH is not set - cannot continue.");
-    return;
-}
-
-if (!Path.Exists(yoyoProjectFile))
-{
-    Console.WriteLine("The YOYO_PROJECT_PATH file does not exist - cannot continue.");
-    return;
-}
-
-Console.WriteLine($"Using project file at: {yoyoProjectFile}");
-
-var projectConfig = ProjectConfiguration.ReadFromFromFile(yoyoProjectFile);
-if (projectConfig is null)
-{
-    Console.WriteLine("The project file does not contain a valid project configuration - cannot continue.");
-    return;
-}
-
-var commandIterator = new CommandIterator(projectConfig);
-var commandsToRun = commandIterator.GetHierarchyAsExecutionList();
-foreach (var stack in commandsToRun)
-{
-    Console.WriteLine($"Stack: {stack.ShortName}, Directory: {stack.DirectoryPath}");    
-}
+var cmds = new RuntimeCommands(projectConfig);
+Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions>(args)
+    .WithParsed<PreviewOptions>(options =>
+    {
+        cmds.RunPreviewCommand(options);
+    })
+    .WithParsed<UpOptions>(options =>
+    {
+        cmds.RunUpCommand(options);
+    })
+    .WithParsed<DestroyOptions>(options =>
+    {
+        cmds.RunDestroyCommand(options);
+    });
 
 // next step: use the PulumiController to: 
 // 1. check if the stack is already deployed - perhaps the cluster is not started, so start it? 

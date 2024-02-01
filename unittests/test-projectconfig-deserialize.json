@@ -10,6 +10,12 @@
       "FullStackName": "test-std-cluster-dev"
     },
     {
+      "ShortName": "lastapp",
+      "DirectoryPath": "last-app",
+      "FullStackName": "test-std-example-last-app-dev",
+      "DependsOn": ["app"]
+    },
+    {
       "ShortName": "app",
       "DirectoryPath": "example-app",
       "FullStackName": "test-std-example-app-dev",
