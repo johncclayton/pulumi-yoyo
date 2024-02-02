@@ -28,14 +28,10 @@ public class PreviewOptions : Options
 [Verb("up", HelpText = "Run a pulumi up command against all the stacks in the project")]
 public class UpOptions : Options
 {
-    [Option("try-start", Required = false, Default = true, HelpText = "For cluster stacks, start them if possible, otherwise create/up")]
-    public bool TryToStart { get; set; }
 }
 
 [Verb(name: "destroy", aliases: new string[] {"delete", "down"}, HelpText = "Run a pulumi destroy command against all the stacks in the project")]
 public class DestroyOptions : Options
 {
-    [Option("try-stop", Required = false, Default = true, HelpText = "For cluster stacks, if automation is active just stop the cluster - don't destroy it.")]
-    public bool TryToStop { get; set; }
 }
 

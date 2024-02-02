@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TargetFrameworks>net7.0;net8.0;net6.0</TargetFrameworks>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>yoyo</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include=".yoyo\dev\cluster\pre-destroy.ps1" />
     <Content Include=".yoyo\dev\cluster\pre-preview.ps1" />
   </ItemGroup>
 

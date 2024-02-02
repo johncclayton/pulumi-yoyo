@@ -1,5 +1,6 @@
 using Moq;
 using pulumi_yoyo;
+using pulumi_yoyo.process;
 
 namespace unittests
 {

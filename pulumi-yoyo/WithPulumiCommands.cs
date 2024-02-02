@@ -1,5 +1,7 @@
-﻿using config;
+﻿using System.Runtime.InteropServices;
+using config;
 using pulumi_yoyo.config;
+using pulumi_yoyo.process;
 
 namespace pulumi_yoyo;
 
@@ -26,12 +28,12 @@ public partial class WithPulumiCommands
     
     public int RunDestroyStage(DestroyOptions options)
     {
-        return RunEach(GetCommands(Stage.Destroy), options);
+        return RunEach(GetCommands(Stage.Destroy), options, reverse: true);
     }
     
-    private int RunEach(IEnumerable<RunnableFactory.ProcessWrapper> getCommands, Options options)
+    private int RunEach(IEnumerable<RunnableFactory.ProcessWrapper> getCommands, Options options, bool reverse = false)
     {
-        foreach (var command in getCommands)
+        foreach (var command in reverse ? getCommands.Reverse() : getCommands)
         {
             if(options.DryRun)
             {
@@ -39,8 +41,11 @@ public partial class WithPulumiCommands
             }
             else
             {
+                command.process.AddOptionsToEnvironment(options);
+                
                 command.process.Start();
                 command.process.WaitForExit();
+                
                 if (command.process.ExitCode != (int)ExitCodeMeaning.Success)
                 {
                     Console.WriteLine($"Error running command: {command}");

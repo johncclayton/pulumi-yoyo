@@ -2,16 +2,16 @@
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Moq;
 using pulumi_yoyo;
+using pulumi_yoyo.process;
 
 namespace unittests;
 
 public class ProcessTests
 {
-    [InlineData(".", true)]
-    [InlineData(".", false)]
-    [InlineData("somewhere", false)]
+    [InlineData(".")]
+    [InlineData("somewhere")]
     [Theory]
-    public void Test_CreateProcess(string workingDirectory, bool shouldWait)
+    public void Test_CreateProcess(string workingDirectory)
     {
         StackConfig test = new StackConfig("shortname", "bleh", "fullname", null);
         var t = RunnableFactory.CreatePulumiProcess(
