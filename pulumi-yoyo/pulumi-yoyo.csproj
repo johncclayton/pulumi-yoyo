@@ -20,11 +20,10 @@
 
   <ItemGroup>
     <Folder Include="api\" />
+    <Folder Include="nupkg\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include=".yoyo\dev\cluster\pre-destroy.ps1" />
-    <Content Include=".yoyo\dev\cluster\pre-preview.ps1" />
-  </ItemGroup>
-
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);.yoyo\**</DefaultItemExcludes>
+  </PropertyGroup>
 </Project>

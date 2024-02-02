@@ -1,15 +1,11 @@
 ﻿using CommandLine;
 using dotenv.net;
 using pulumi_yoyo;
-using pulumi_yoyo.api;
 using pulumi_yoyo.config;
 
-DotEnv.Fluent()
-    .WithProbeForEnv(4)
-    .WithTrimValues()
-    .Load();
+DotEnv.Fluent().Load();
 
-var yoyoProjectFile = EnvReaderExtensions.GetOptionalStringValue("YOYO_PROJECT_PATH");
+var yoyoProjectFile = Environment.GetEnvironmentVariable("YOYO_PROJECT_PATH");
 if(yoyoProjectFile is null)
 {
     Console.WriteLine("YOYO_PROJECT_PATH is not set - cannot continue.");
