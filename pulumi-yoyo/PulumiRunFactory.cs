@@ -5,20 +5,35 @@ namespace pulumi_yoyo;
 public interface IProcess
 {
     void Start();
-    void BeginOutputReadLine();
-    void BeginErrorReadLine();
     void WaitForExit();
     int ExitCode { get; }
     ProcessStartInfo StartInfo { get; set; }
 }
 
-public class DotNetProcess : IProcess
+public class ProcessWithOutputFunctions : IProcess
 {
     public Process Process { get; set; }
 
-    public DotNetProcess(Process process)
+    public ProcessWithOutputFunctions(Process process, Func<string, bool, bool> outputFunc)
     {
         Process = process;
+        
+        Process.OutputDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                outputFunc(e.Data, true);
+            }
+        };
+
+        Process.ErrorDataReceived += (sender, e) =>
+        {
+            if (!string.IsNullOrEmpty(e.Data))
+            {
+                outputFunc(e.Data, false);
+            }
+        };
+
     }
 
     public ProcessStartInfo StartInfo
@@ -32,16 +47,8 @@ public class DotNetProcess : IProcess
     public void Start()
     {
         Process.Start();
-    }
-
-    public void BeginOutputReadLine()
-    {
-        Process.BeginOutputReadLine();
-    }
-
-    public void BeginErrorReadLine()
-    {
         Process.BeginErrorReadLine();
+        Process.BeginOutputReadLine();
     }
 
     public void WaitForExit()
@@ -50,12 +57,14 @@ public class DotNetProcess : IProcess
     }
 }
 
-public class PulumiProcessFactory
+public class PulumiRunFactory
 {
     public class ProcessWrapper
     {
-        public IProcess process;
-        public bool waitForExit;
+        // ReSharper disable once InconsistentNaming
+        public readonly IProcess process;
+        // ReSharper disable once InconsistentNaming
+        public readonly bool waitForExit;
 
         public ProcessWrapper(IProcess p, bool b)
         {
@@ -64,7 +73,8 @@ public class PulumiProcessFactory
         }
     }
     
-    public static ProcessWrapper CreatePulumiProcess(string workingDirectory, IEnumerable<string> args, bool waitForExit = true)
+    public static ProcessWrapper CreateViaProcess(string workingDirectory, 
+        IEnumerable<string> args, Func<string, bool> outputFunc, Func<string, bool> errorFunc, bool waitForExit = true)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -87,7 +97,18 @@ public class PulumiProcessFactory
             }
         }
 
-        var theWrappedProcess = new DotNetProcess(new Process { StartInfo = startInfo });
+        var theWrappedProcess = new ProcessWithOutputFunctions(new Process { StartInfo = startInfo },
+            (string s, bool b) =>
+            {
+                if (b)
+                {
+                    return outputFunc(s);
+                }
+                else
+                {
+                    return errorFunc(s);
+                }
+            });
         
         return new ProcessWrapper(theWrappedProcess, waitForExit);
     }
@@ -95,29 +116,8 @@ public class PulumiProcessFactory
     public static IProcess RunPulumiProcessWithConsole(ProcessWrapper wrapper)
     {
         var process = wrapper.process;
-        var dotnetProcess = process as Process;
-        if (dotnetProcess != null)
-        {
-            dotnetProcess.OutputDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                {
-                    Console.WriteLine(e.Data);
-                }
-            };
-
-            dotnetProcess.ErrorDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                {
-                    Console.Error.WriteLine(e.Data);
-                }
-            };
-        }
-
+        
         process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
 
         if(wrapper.waitForExit)
             process.WaitForExit();

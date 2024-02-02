@@ -29,7 +29,7 @@ public class RuntimeCommands
         return RunEach(GetCommands(new string[] {"destroy"}), options);
     }
     
-    private int RunEach(IEnumerable<PulumiProcessFactory.ProcessWrapper> getCommands, Options options)
+    private int RunEach(IEnumerable<PulumiRunFactory.ProcessWrapper> getCommands, Options options)
     {
         foreach (var command in getCommands)
         {
@@ -39,7 +39,7 @@ public class RuntimeCommands
             }
             else
             {
-                var process = PulumiProcessFactory.RunPulumiProcessWithConsole(command);
+                var process = PulumiRunFactory.RunPulumiProcessWithConsole(command);
                 if (process.ExitCode != 0)
                 {
                     Console.WriteLine($"Error running command: {command}");
@@ -51,7 +51,7 @@ public class RuntimeCommands
         return 0;
     }
 
-    private IEnumerable<PulumiProcessFactory.ProcessWrapper> GetCommands(string[] commands)
+    private IEnumerable<PulumiRunFactory.ProcessWrapper> GetCommands(string[] commands)
     {
         foreach (var stack in _execList)
         {
@@ -64,7 +64,15 @@ public class RuntimeCommands
         
             theStackArgs.AddRange(commands);
 
-            yield return PulumiProcessFactory.CreatePulumiProcess(workingDirectory, theStackArgs, waitForExit: true);
+            yield return PulumiRunFactory.CreateViaProcess(workingDirectory, theStackArgs, (string msg) =>
+            {
+                Console.WriteLine(msg);
+                return true;
+            }, (string msg) =>
+            {
+                Console.WriteLine(msg);
+                return false;
+            }, true);
         }
     }
 }

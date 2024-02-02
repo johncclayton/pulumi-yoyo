@@ -12,9 +12,9 @@ public class ProcessTests
     [Theory]
     public void Test_CreateProcess(string workingDirectory, bool shouldWait)
     {
-        var t = PulumiProcessFactory.CreatePulumiProcess(
+        var t = PulumiRunFactory.CreateViaProcess(
             workingDirectory,
-            new string[] { "up", "--skip-preview" }, waitForExit: shouldWait);
+            new string[] { "up", "--skip-preview" }, (msg) => true, (string msg) => true, waitForExit: shouldWait);
         Assert.Equal(shouldWait, t.waitForExit);
         Assert.Equal("pulumi", t.process.StartInfo.FileName);
         Assert.Equal("up --skip-preview", t.process.StartInfo.Arguments);
@@ -26,15 +26,13 @@ public class ProcessTests
     {
         // Arrange
         var mockProcess = new Mock<IProcess>();
-        var wrapper = new PulumiProcessFactory.ProcessWrapper(mockProcess.Object, true);
+        var wrapper = new PulumiRunFactory.ProcessWrapper(mockProcess.Object, true);
 
         // Act
-        PulumiProcessFactory.RunPulumiProcessWithConsole(wrapper);
+        PulumiRunFactory.RunPulumiProcessWithConsole(wrapper);
 
         // Assert
         mockProcess.Verify(p => p.Start(), Times.Once);
-        mockProcess.Verify(p => p.BeginOutputReadLine(), Times.Once);
-        mockProcess.Verify(p => p.BeginErrorReadLine(), Times.Once);
         mockProcess.Verify(p => p.WaitForExit(), Times.Once);
 
     }
@@ -44,10 +42,10 @@ public class ProcessTests
     {
         // Arrange
         var mockProcess = new Mock<IProcess>();
-        var wrapper = new PulumiProcessFactory.ProcessWrapper(mockProcess.Object, false);
+        var wrapper = new PulumiRunFactory.ProcessWrapper(mockProcess.Object, false);
 
         // Act
-        PulumiProcessFactory.RunPulumiProcessWithConsole(wrapper);
+        PulumiRunFactory.RunPulumiProcessWithConsole(wrapper);
 
         // Assert
         mockProcess.Verify(p => p.WaitForExit(), Times.Never);
