@@ -82,4 +82,6 @@ public class LinkedProcess : IProcess
         FirstProcess.AddOptionsToEnvironment(options);
         ThenProcess.AddOptionsToEnvironment(options);
     }
+    
+    public IDictionary<string, string> Environment => FirstProcess.Environment;
 }

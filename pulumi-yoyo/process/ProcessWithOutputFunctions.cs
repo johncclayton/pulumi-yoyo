@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 using config;
 
@@ -28,20 +29,19 @@ public class ProcessWithOutputFunctions : IProcess
             }
         };
     }
-
-    public void AddOptionsToEnvironment(Options options)
+    
+    public IDictionary<string, string> Environment 
     {
-        Options = options;
-        
-        // iterate all the properties of the options, and add them to the environment
-        foreach (var property in options.GetType().GetProperties())
+        get
         {
-            var name = property.Name.ToUpper().Replace("-", "_");
-            var value = property.GetValue(options)?.ToString();
-            if (value != null)
+            IDictionary<string, string> env = new Dictionary<string, string>();
+            foreach(KeyValuePair<string, string?> entry in Process.StartInfo.Environment)
             {
-                Process.StartInfo.EnvironmentVariables["YOYO_OPTION_" + name] = value;
+                if(!string.IsNullOrEmpty(entry.Value))
+                    env[entry.Key] = entry.Value;
             }
+
+            return env;
         }
     }
 
@@ -70,10 +70,26 @@ public class ProcessWithOutputFunctions : IProcess
         set => Process.StartInfo.WorkingDirectory = value;
     }
     
+    public void AddOptionsToEnvironment(Options options)
+    {
+        Options = options;
+        
+        // iterate all the properties of the options, and add them to the environment
+        foreach (var property in options.GetType().GetProperties())
+        {
+            var name = property.Name.ToUpper().Replace("-", "_");
+            var value = property.GetValue(options)?.ToString();
+            if (value != null)
+            {
+                Process.StartInfo.EnvironmentVariables["YOYO_OPTION_" + name] = value;
+            }
+        }
+    }
+    
     public void AddStackAndStageToEnvironment(StackConfig stack, Stage stage)
     {
-        Process.StartInfo.EnvironmentVariables["YOYO_FULL_STACK_NAME"] = stack.FullStackName;
-        Process.StartInfo.EnvironmentVariables["YOYO_SHORT_NAME"] = stack.ShortName;
+        Process.StartInfo.EnvironmentVariables["YOYO_STACK_FULL_STACK_NAME"] = stack.FullStackName;
+        Process.StartInfo.EnvironmentVariables["YOYO_STACK_SHORT_NAME"] = stack.ShortName;
         Process.StartInfo.EnvironmentVariables["YOYO_STAGE"] = stage.ToString();
     }
 }

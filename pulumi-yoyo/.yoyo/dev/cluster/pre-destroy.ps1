@@ -3,16 +3,16 @@
 # If this is a cluster, we can just stop it - and thats it - no need to delete it.
 #
  
-if(-not $env:YOYO_FULL_STACK_NAME)
+if(-not $env:YOYO_STACK_FULL_STACK_NAME)
 {
-    Write-Host "YOYO_FULL_STACK_NAME is not set - we cannot continue"
+    Write-Host "YOYO_FULL_STACK_NAME is not set - cannot continue"
     return 1
 }
 
-Write-Host "Running pre-destroy.sh for ${env:YOYO_FULL_STACK_NAME} - will check if the cluster is running and just stop it rather than deleting it"
+Write-Host "Running pre-destroy.sh for ${env:YOYO_STACK_FULL_STACK_NAME} - will check if the cluster is running and just stop it rather than deleting it"
 
-$envStackName = & pulumi stack -s $env:YOYO_FULL_STACK_NAME output EnvironmentStackName
-$clusterName = & pulumi stack -s $env:YOYO_FULL_STACK_NAME output ClusterName 
+$envStackName = & pulumi stack -s $env:YOYO_STACK_FULL_STACK_NAME output EnvironmentStackName
+$clusterName = & pulumi stack -s $env:YOYO_STACK_FULL_STACK_NAME output ClusterName 
 $clusterRg = & pulumi stack -s $envStackName output ClusterResourceGroup
 
 $cluster = Get-AzAksCluster -Name $clusterName -ResourceGroupName $clusterRg

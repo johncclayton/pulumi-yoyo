@@ -1,16 +1,16 @@
 Write-Host "Running pre-preview.ps1 - will check if the cluster is running and start it if not"
-Write-Host "Full stack name:", $env:YOYO_FULL_STACK_NAME
+Write-Host "Full stack name:", $env:YOYO_STACK_FULL_STACK_NAME
 
 $ErrorActionPreference = "Stop"
 
-$envStackName = & pulumi stack -s $env:YOYO_FULL_STACK_NAME output EnvironmentStackName 
+$envStackName = & pulumi stack -s $env:YOYO_STACK_FULL_STACK_NAME output EnvironmentStackName 
 if($LASTEXITCODE -ne 0)
 {
     Write-Host "Error getting EnvironmentStackName - cannot continue"
     exit 1
 }
 
-$clusterName = & pulumi stack -s $env:YOYO_FULL_STACK_NAME output ClusterName
+$clusterName = & pulumi stack -s $env:YOYO_STACK_FULL_STACK_NAME output ClusterName
 if($LASTEXITCODE -ne 0)
 {
     Write-Host "Error getting ClusterName - cannot continue"

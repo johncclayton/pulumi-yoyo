@@ -1,11 +1,10 @@
-﻿using System.Runtime.InteropServices;
-using config;
+﻿using config;
 using pulumi_yoyo.config;
 using pulumi_yoyo.process;
 
 namespace pulumi_yoyo;
 
-public partial class WithPulumiCommands
+public class WithPulumiCommands
 {
     private readonly IList<StackConfig> _execList;
     private readonly ConfigurationIterator _commandIterator;
@@ -57,7 +56,7 @@ public partial class WithPulumiCommands
         return 0;
     }
 
-    private IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage)
+    public IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage)
     {
         foreach (var stack in _execList)
         {

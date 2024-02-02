@@ -1,3 +1,5 @@
+using System.Collections;
+using config;
 using Moq;
 using pulumi_yoyo;
 using pulumi_yoyo.process;
@@ -29,6 +31,40 @@ namespace unittests
         }
 
         [Fact]
+        public void Test_ThatApplyingStackConfigToLinkedProcessWorks()
+        {
+            Func<string, bool> func = (s => true);
+            var process1 = RunnableFactory.CreateScriptProcess("script.ps1", "hello", new []{"hello"}, func, func);
+            var process2 = RunnableFactory.CreateScriptProcess("script.ps1", "world", new []{"world"}, func, func);
+            var linkedProcess = new LinkedProcess(process1, process2);
+
+            var test = new StackConfig("shortname", "bleh", "fullname", null);
+            var sampleOptions = new Options();
+            sampleOptions.Verbose = false;
+            sampleOptions.ConfigFile = "configfile";
+            sampleOptions.DryRun = true;
+            
+            linkedProcess.AddStackAndStageToEnvironment(test, Stage.Up);
+            linkedProcess.AddOptionsToEnvironment(sampleOptions);
+
+            var theEnvironment = linkedProcess.Environment;
+            Assert.Contains("YOYO_STACK_SHORT_NAME", theEnvironment.Keys);
+            Assert.Contains("YOYO_STACK_FULL_STACK_NAME", theEnvironment.Keys);
+            Assert.Contains("YOYO_STAGE", theEnvironment.Keys);
+            
+            Assert.Equal("shortname", linkedProcess.Environment["YOYO_STACK_SHORT_NAME"]);
+            Assert.Equal("fullname", linkedProcess.Environment["YOYO_STACK_FULL_STACK_NAME"]);
+
+            Assert.Contains("YOYO_OPTION_DRYRUN", theEnvironment.Keys);
+            Assert.Contains("YOYO_OPTION_VERBOSE", theEnvironment.Keys);
+            Assert.Contains("YOYO_OPTION_CONFIGFILE", theEnvironment.Keys);
+            
+            Assert.Equal("True", linkedProcess.Environment["YOYO_OPTION_DRYRUN"]);
+            Assert.Equal("False", linkedProcess.Environment["YOYO_OPTION_VERBOSE"]);
+            Assert.Equal("configfile", linkedProcess.Environment["YOYO_OPTION_CONFIGFILE"]);
+        }
+        
+        [Fact]
         public void Start_FirstProcessSuccessAndRunLinkedProcessToo()
         {
             var mockProcess = new Mock<IProcess>();
@@ -47,8 +83,8 @@ namespace unittests
             mockProcess2.Verify(p => p.Start(), Times.Once);
             mockProcess2.Verify(p => p.WaitForExit(), Times.Once);
             
-            Assert.Equal((int)ExitCodeMeaning.SuccessAndLinkedContinue, linkedProcess.ExitCode);
-            Assert.Equal(34, linkedProcess.ThenProcess.ExitCode);
+            Assert.Equal((int)ExitCodeMeaning.SuccessAndLinkedContinue, linkedProcess.FirstProcess.ExitCode);
+            Assert.Equal(34, linkedProcess.ExitCode);
         }
     }
 }

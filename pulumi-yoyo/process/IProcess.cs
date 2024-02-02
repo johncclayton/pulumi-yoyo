@@ -34,10 +34,14 @@ public interface IProcess
     void AddStackAndStageToEnvironment(StackConfig stack, Stage stage);
     /// <summary>
     /// Adds the options to the environment, the format is as follows:
-    /// YOYO_OPTION_<PROPERTY NAME>: The value of the property
+    /// YOYO_OPTION_&lt;PROPERTY NAME&gt;: The value of the property
     /// Dashes in property names are turned into underscores.  The entire name is uppercase.
     /// For example, the Option property called "dry-run" becomes YOYO_OPTION_DRY_RUN
     /// </summary>
     /// <param name="options">The options to add to the environment</param>
     void AddOptionsToEnvironment(Options options);
+    /// <summary>
+    /// Returns the entire environment of the process as a dictionary.
+    /// </summary>
+    IDictionary<string, string> Environment { get; }
 }
