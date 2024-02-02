@@ -19,4 +19,8 @@
     <Folder Include="api\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include=".yoyo\dev\cluster\pre-preview.ps1" />
+  </ItemGroup>
+
 </Project>

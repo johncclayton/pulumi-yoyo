@@ -1,3 +1,4 @@
+using Pulumi;
 using pulumi_yoyo.config;
 
 namespace unittests;
@@ -9,10 +10,13 @@ public class SerializationUnitTests
     {
         var data = File.ReadAllText("../../../test-projectconfig-deserialize.json");
         ProjectConfiguration? obj = ProjectConfiguration.ReadFromData(data);
+        
         Assert.NotNull(obj);
         Assert.NotNull(obj.Environment);
         Assert.NotNull(obj.Stacks);
+        Assert.NotNull(obj.Name);
         
+        Assert.Equal("test", obj.Name);
         Assert.Equal(4, obj.Stacks.Count);
         Assert.Equal("wahaay", obj.Environment.SubscriptionName);
         

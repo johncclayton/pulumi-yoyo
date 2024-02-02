@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using config;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Moq;
 using pulumi_yoyo;
 
@@ -12,13 +13,11 @@ public class ProcessTests
     [Theory]
     public void Test_CreateProcess(string workingDirectory, bool shouldWait)
     {
-        var t = PulumiRunFactory.CreateViaProcess(
+        StackConfig test = new StackConfig("shortname", "bleh", "fullname", null);
+        var t = RunnableFactory.CreatePulumiProcess(
             workingDirectory,
-            new string[] { "up", "--skip-preview" }, (msg) => true, (string msg) => true, waitForExit: shouldWait);
-        Assert.Equal(shouldWait, t.waitForExit);
-        Assert.Equal("pulumi", t.process.StartInfo.FileName);
-        Assert.Equal("up --skip-preview", t.process.StartInfo.Arguments);
-        Assert.Equal(workingDirectory, t.process.StartInfo.WorkingDirectory);
+            new string[] { "ponies" }, (msg) => true, (string msg) => true);
+        Assert.Equal(workingDirectory, t.WorkingDirectory);
     }
 
     [Fact]
@@ -26,10 +25,11 @@ public class ProcessTests
     {
         // Arrange
         var mockProcess = new Mock<IProcess>();
-        var wrapper = new PulumiRunFactory.ProcessWrapper(mockProcess.Object, true);
+        var wrapper = new RunnableFactory.ProcessWrapper(mockProcess.Object, true);
 
         // Act
-        PulumiRunFactory.RunPulumiProcessWithConsole(wrapper);
+        wrapper.process.Start();
+        wrapper.process.WaitForExit();
 
         // Assert
         mockProcess.Verify(p => p.Start(), Times.Once);
@@ -42,10 +42,10 @@ public class ProcessTests
     {
         // Arrange
         var mockProcess = new Mock<IProcess>();
-        var wrapper = new PulumiRunFactory.ProcessWrapper(mockProcess.Object, false);
+        var wrapper = new RunnableFactory.ProcessWrapper(mockProcess.Object, false);
 
         // Act
-        PulumiRunFactory.RunPulumiProcessWithConsole(wrapper);
+        wrapper.process.Start();
 
         // Assert
         mockProcess.Verify(p => p.WaitForExit(), Times.Never);

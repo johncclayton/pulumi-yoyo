@@ -1,4 +1,5 @@
 {
+  "Name": "test",
   "Environment": {
     "SubscriptionName": "wahaay",
     "DefaultDirectoryForEnvironment": "monkey"

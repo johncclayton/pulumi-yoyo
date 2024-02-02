@@ -1,4 +1,5 @@
 {
+  "Name": "dev",
   "Environment": {
     "SubscriptionName": "wahaay",
     "DefaultDirectoryForEnvironment": "g:/soxes/quickstart/testing"

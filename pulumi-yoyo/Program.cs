@@ -40,19 +40,20 @@ if (projectConfig is null)
 
 // var client = new PulumiServiceApiClient(pulumiAccessToken);
 
-var cmds = new RuntimeCommands(projectConfig);
+var cmds = new WithPulumiCommands(projectConfig);
+
 Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions>(args)
     .WithParsed<PreviewOptions>(options =>
     {
-        cmds.RunPreviewCommand(options);
+        cmds.RunPreviewStage(options);
     })
     .WithParsed<UpOptions>(options =>
     {
-        cmds.RunUpCommand(options);
+        cmds.RunUpStage(options);
     })
     .WithParsed<DestroyOptions>(options =>
     {
-        cmds.RunDestroyCommand(options);
+        cmds.RunDestroyStage(options);
     });
 
 // next step: use the PulumiController to: 
