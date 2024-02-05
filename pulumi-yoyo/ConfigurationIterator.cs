@@ -1,10 +1,10 @@
 ﻿using config;
+using Microsoft.Extensions.DependencyInjection;
 using pulumi_yoyo.config;
+using QuikGraph;
+using QuikGraph.Algorithms.Search;
 
 namespace pulumi_yoyo;
-
-// using ResponseWithFunc = Tuple<StackConfig, Func<ProjectConfiguration, StackConfig, bool>>;
-using Response = StackConfig;
 
 public class ConfigurationIterator
 {
@@ -15,35 +15,73 @@ public class ConfigurationIterator
 
     public ProjectConfiguration Configuration { get; set; }
 
-    public IList<Response> GetHierarchyAsExecutionList()
+    public IList<StackConfig> GetHierarchyAsExecutionList()
     {
-        var response = new List<Response>();
-        return IterateStacks(response, Configuration.Stacks);
+        var response = new List<StackConfig>();
+        IterateStacks(response, Configuration.Stacks, null);
+        return response;
+        /*
+        var graph = GetGraph();
+        var dfs = new DepthFirstSearchAlgorithm<string, Edge<string>>(graph);
+        dfs.TreeEdge += (action) =>
+        {
+            StackConfig? sourceConfig = Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Source);
+            StackConfig? targetConfig = Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Target);
+            if (sourceConfig == null || targetConfig == null)
+                return;
+
+            if (response.All(c => c.ShortName != action.Source))
+                response.Add(sourceConfig);
+
+            if (response.All(c => c.ShortName != action.Target))
+                response.Add(targetConfig);
+        };
+        
+        dfs.Compute();
+        response.Reverse();
+        */
+        
+        return response;
     }
     
-    private IList<Response> IterateStacks(List<Response> response, IList<StackConfig> stacks)
+    private void IterateStacks(IList<StackConfig> response, IList<StackConfig> stacks, StackConfig?  parentStack, 
+        Func<StackConfig, StackConfig?, bool>? func = null)
     {
-        // iterate the hierarchy, calling func() on each object.
         foreach (var oneStack in stacks)
         {
             if (oneStack.DependsOn is { Count: > 0 })
             {
-                // create a list of the dependant stacks... 
-                var dependentStacks = new List<StackConfig>();
+                var dependsOn = new List<StackConfig>();
                 foreach (var dep in oneStack.DependsOn)
                 {
                     var depStack = Configuration.Stacks.FirstOrDefault(x => x.ShortName == dep);
                     if (null != depStack)
-                        dependentStacks.Add(depStack);
+                        dependsOn.Add(depStack);
                 }
                 
                 // recurse into the dependent stacks
-                IterateStacks(response, dependentStacks);
+                IterateStacks(response, dependsOn, oneStack, func);
             }
-            
-            // if the oneStack is NOT in the response list, add it
-            if(response.All(x => x.ShortName != oneStack.ShortName))
+    
+            if (response.All(x => x.ShortName != oneStack.ShortName))
+            {
                 response.Add(oneStack);
+                func?.Invoke(oneStack, parentStack);
+            }
+        }
+    }
+
+    public BidirectionalGraph<string, Edge<string>> GetGraph()
+    {
+        var response = new BidirectionalGraph<string, Edge<string>>();
+        foreach(var stack in Configuration.Stacks)
+        {
+            response.AddVertex(stack.ShortName);
+            if (stack.DependsOn != null)
+                foreach (var dependsOn in stack.DependsOn)
+                {
+                    response.AddVerticesAndEdge(new Edge<string>(stack.ShortName, dependsOn));
+                }
         }
 
         return response;

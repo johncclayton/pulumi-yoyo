@@ -38,7 +38,7 @@ if (projectConfig is null)
 
 var cmds = new WithPulumiCommands(projectConfig);
 
-Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions>(args)
+Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions, ShowOptions>(args)
     .WithParsed<PreviewOptions>(options =>
     {
         cmds.RunPreviewStage(options);
@@ -50,7 +50,12 @@ Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions>(args)
     .WithParsed<DestroyOptions>(options =>
     {
         cmds.RunDestroyStage(options);
-    });
+    })
+    .WithParsed<ShowOptions>(options =>
+    {
+        cmds.ShowViaSpectre();
+    })
+    ;
 
 // next step: use the PulumiController to: 
 // 1. check if the stack is already deployed - perhaps the cluster is not started, so start it? 

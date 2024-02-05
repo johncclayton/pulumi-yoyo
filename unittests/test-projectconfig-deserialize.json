@@ -14,7 +14,7 @@
       "ShortName": "lastapp",
       "DirectoryPath": "last-app",
       "FullStackName": "test-std-example-last-app-dev",
-      "DependsOn": ["app"]
+      "DependsOn": ["app", "cluster"]
     },
     {
       "ShortName": "app",

@@ -20,7 +20,7 @@ public class Options
     public bool Verbose { get; set; }
 }
 
-[Verb("preview", isDefault: true, HelpText = "Run a pulumi preview command against all the stacks in the project")]
+[Verb("preview", HelpText = "Run a pulumi preview command against all the stacks in the project")]
 public class PreviewOptions : Options 
 {
 }
@@ -32,6 +32,11 @@ public class UpOptions : Options
 
 [Verb(name: "destroy", aliases: new string[] {"delete", "down"}, HelpText = "Run a pulumi destroy command against all the stacks in the project")]
 public class DestroyOptions : Options
+{
+}
+
+[Verb(name: "show", isDefault: true, aliases: new string[] {"info"}, HelpText = "Show the project configuration")]
+public class ShowOptions 
 {
 }
 

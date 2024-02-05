@@ -1,6 +1,11 @@
-﻿using config;
+﻿using System.Runtime.InteropServices;
+using config;
 using pulumi_yoyo.config;
 using pulumi_yoyo.process;
+using QuikGraph;
+using QuikGraph.Algorithms.Observers;
+using QuikGraph.Algorithms.Search;
+using Spectre.Console;
 
 namespace pulumi_yoyo;
 
@@ -147,5 +152,38 @@ public class WithPulumiCommands
         }
         
         return (false, string.Empty);
+    }
+
+    public void ShowViaSpectre()
+    {
+        // show config as a hierarchy/tree in spectre
+        var ruler = new Rule("[green]Project Graph[/]");
+        ruler.Justification = Justify.Left;
+        AnsiConsole.Write(ruler);
+        
+        var tree = new Tree("");
+        
+        IDictionary<string, TreeNode> theNodes = new Dictionary<string, TreeNode>();
+        
+        var graph = _commandIterator.GetGraph();
+        var dfs = new DepthFirstSearchAlgorithm<string, Edge<string>>(graph);
+        dfs.ExamineEdge += (action) =>
+        {
+            StackConfig? sourceConfig = _commandIterator.Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Source);
+            StackConfig? targetConfig = _commandIterator.Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Target);
+            
+            if (!theNodes.ContainsKey(action.Source))
+                theNodes[action.Source] = tree.AddNode($"{action.Source}: {sourceConfig?.FullStackName}");
+            
+            if (!theNodes.ContainsKey(action.Target))
+            {
+                var target = theNodes[action.Source].AddNode($"{action.Target}: {targetConfig?.FullStackName}");
+                theNodes[action.Target] = target;
+            }
+        };
+        
+        dfs.Compute();
+        
+        AnsiConsole.Write(tree);
     }
 }

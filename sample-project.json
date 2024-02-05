@@ -14,7 +14,7 @@
       "ShortName": "app",
       "DirectoryPath": "example-app",
       "FullStackName": "test-std-example-app-dev",
-      "DependsOn": ["mssql"]
+      "DependsOn": ["mssql", "cluster"]
     },
     {
       "ShortName": "mssql",
