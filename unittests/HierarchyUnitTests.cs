@@ -1,13 +1,15 @@
-﻿using pulumi_yoyo;
+﻿using Microsoft.Extensions.Logging;
+using pulumi_yoyo;
 using pulumi_yoyo.config;
+using Xunit.Abstractions;
 
 namespace unittests;
 
 public class HierarchyUnitTests
 {
     private readonly ProjectConfiguration? _projectConfiguration;
-
-    public HierarchyUnitTests()
+    
+    public HierarchyUnitTests(ITestOutputHelper output)
     {
         var data = File.ReadAllText("../../../test-projectconfig-deserialize.json");
         _projectConfiguration = ProjectConfiguration.ReadFromData(data);

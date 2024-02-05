@@ -2,6 +2,7 @@
 using System.Text.Json;
 
 namespace pulumi_yoyo.config;
+
 public record ProjectConfiguration(
     string Name,
     EnvironmentConfig Environment,

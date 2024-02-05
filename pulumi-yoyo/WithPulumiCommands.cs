@@ -157,8 +157,11 @@ public class WithPulumiCommands
     public void ShowViaSpectre()
     {
         // show config as a hierarchy/tree in spectre
-        var ruler = new Rule("[green]Project Graph[/]");
-        ruler.Justification = Justify.Left;
+        var ruler = new Rule("[green]Project Graph[/]")
+        {
+            Justification = Justify.Left
+        };
+        
         AnsiConsole.Write(ruler);
         
         var tree = new Tree("");

@@ -6,11 +6,6 @@
   },
   "Stacks": [
     {
-      "ShortName": "cluster",
-      "DirectoryPath": "example-cluster",
-      "FullStackName": "test-std-cluster-dev"
-    },
-    {
       "ShortName": "app",
       "DirectoryPath": "example-app",
       "FullStackName": "test-std-example-app-dev",
@@ -21,6 +16,11 @@
       "DirectoryPath": "example-mssql",
       "FullStackName": "test-std-example-mssql-dev",
       "DependsOn": ["cluster"]
+    },
+    {
+      "ShortName": "cluster",
+      "DirectoryPath": "example-cluster",
+      "FullStackName": "test-std-cluster-dev"
     }
   ]
 }
