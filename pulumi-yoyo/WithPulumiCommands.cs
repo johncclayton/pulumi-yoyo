@@ -136,7 +136,7 @@ public class WithPulumiCommands
             var workingDirectory = _commandIterator.Configuration.DirectoryPathForStack(stack);
             
             var preFilename = Path.Combine(_commandIterator.Configuration.Name.ToLower(), stack.ShortName.ToLower(),
-                $"pre-{stage.ToString().ToLower()}.{fileExtension}");
+                $"pre-stage.{fileExtension}");
             
             var preScriptPath = Path.GetFullPath(Path.Combine(workingDirectory, ".yoyo", preFilename));
             if (File.Exists(preScriptPath))

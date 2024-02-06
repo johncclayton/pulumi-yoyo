@@ -9,6 +9,8 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>yoyo</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+    <Version>1.0.1</Version>
+    <Description>Yoyo - bring your Pulumi stacks up and down in one go, as a unit</Description>
   </PropertyGroup>
 
   <ItemGroup>
