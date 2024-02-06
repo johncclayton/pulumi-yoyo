@@ -71,6 +71,16 @@ pay for a running cluster - just the allocated disks.
 The way to do this is to write a pre-stage.[ps1|bash|python|node] script, and place this in a very particular location so 
 that Yoyo can find it. 
 
+## How it works
+
+Yoyo will look for scripts (see below for the names/locations).  If the scripts are found, then they are executed before the
+Pulumi command is run.
+
+Depending on the exit code of the script, the Pulumi command will be run or not.  This is useful for example if you want to stop the command from proceeding
+if a certain condition is met.  
+
+See [Exit Codes](#exit-codes) for more information.
+
 ## Location of pre-stage scripts
 
 The location of the scripts follows this format: 
@@ -144,3 +154,18 @@ The following environment variables are set _in addition to every current enviro
 | YOYO_OPTION_VERBOSE         | True if the command is verbose      | True                                     |
  | YOYO_WORKING_DIRECTORY     | The directory the command is run in | g:/src/quickstart/testing/example-app    |
 
+## Exit Codes
+
+Preview: the exit codes are likely to change.
+
+The exit codes are used to steer further processing of the stack hierarchy.  If a pre-stage script returns a non-zero exit code, then the
+command will not proceed to the next stack in the hierarchy.  This is useful for example if you want to stop the command from proceeding
+if a certain condition is met.
+
+If the exit code is zero, then the command will **ALSO NOT** proceed to the next stack in the hierarchy.
+
+That is worth repeating: if the exit code is zero, then the command will **ALSO NOT** proceed to the next stack in the hierarchy.
+
+To ensure that the pulumi command IS RUN, the script must return an exit code of exactly: 100.
+
+Weird, but that's how it works today. 
