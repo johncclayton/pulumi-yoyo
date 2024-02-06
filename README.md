@@ -11,7 +11,10 @@ Batteries included:
 
 ## Install
 
-dotnet tool install --global Pulumi.Yoyo
+Erm.  Right now its check out this code and run it :-)  I'm working on getting it published to nuget (but my eyes
+are tired). 
+
+[//]: # (dotnet tool install --global Pulumi.Yoyo)
 
 ## Usage
 
