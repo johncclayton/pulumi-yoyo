@@ -157,6 +157,17 @@ Here's a full example of a configuration - hopefully this is reasonably clear.
 }
 ```
 
+## Configuration Parameters
+
+### Name
+The name of the environment.  This is used to find the correct environment configuration when running yoyo commands.  It is also used to find the correct pre-stage scripts.
+
+### Environment
+The environment configuration.  This is used to set the default directory for the environment.  It is also used to set the subscription name for the environment.  The subscription name is not used by Yoyo, but is useful for documentation purposes.
+
+### Stacks
+The list of stacks that are part of the environment.  Each stack has a short name, a directory path and a full stack name.  The short name is used to identify the stack in yoyo commands.  The directory path is used to find the stack on the file system.  The full stack name is used to identify the stack in pulumi commands.  The depends on list is used to determine the order in which the stacks should be operated on.  This is useful for example when bringing up a stack hierarchy, where one stack depends on another.
+
 ## Parameters to pre-stage scripts
 
 No parameters are passed to the pre-stage scripts, but they can use environment variables to get information about the stack
