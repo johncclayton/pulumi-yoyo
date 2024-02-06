@@ -76,11 +76,13 @@ that Yoyo can find it.
 The location of the scripts follows this format: 
     
 ```plaintext
-<environment directory>.yoyo/<environment name>/<stack short name>/pre-stage.[ps1|bash|python|node]
+<environment directory>/.yoyo/<environment name>/<stack short name>/pre-stage.[ps1|bash|python|node]
 ```
 
-The environment directory is _either_ declared in the EnvironmentConfig section of the JSON configuration, in which
+The environment directory is _either_ declared in the `Environment.DefaultDirectoryForEnvironment` section of the JSON configuration, in which
 case this value is used, or it is the current working directory.
+
+## Example Configuration
 
 Here's a full example of a configuration: 
 
