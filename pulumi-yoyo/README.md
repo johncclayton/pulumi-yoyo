@@ -41,13 +41,13 @@ Would run command: pulumi up --skip-preview -s test-std-example-mssql-dev --non-
 Would run command: pulumi up --skip-preview -s test-std-example-app-dev --non-interactive
 ```
 
-TODO: You can also use Yoyo to bring up just the database, notice the use of the short-name "mssql"
+You can also use Yoyo to bring up just the database, notice the use of the short-name "mssql" and the --to-stack option.
 
 ```bash
 yoyo up -to mssql
 ```
 
-TODO: Or just the cluster, notice the use of the short-name "cluster"
+Or just the cluster, notice the use of the short-name "cluster"
 
 ```bash
 yoyo up -to cluster
@@ -67,4 +67,80 @@ Would run command: pulumi destroy --yes -s test-std-cluster-dev --non-interactiv
 
 You can!
 
-Lets imagine that I do not want to destroy the cluster, instead I just want to shut it down.  This saves me money, and also time - I don't pay for a running cluster - just the allocated disks.
+Lets imagine that I do not want to destroy the cluster, instead I just want to shut it down.  This saves me money, and also time - I don't 
+pay for a running cluster - just the allocated disks.
+
+The way to do this is to write a pre-stage.[ps1|bash|python|node] script, and place this in a very particular location so 
+that Yoyo can find it. 
+
+## Location of pre-stage scripts
+
+The location of the scripts follows this format: 
+    
+    ```
+    &lt;<environment directory>&gt;.yoyo/&lt;environment name&gt;/&lt;stack short name&gt;/pre-stage.<ps1|bash|python|node>
+    ```
+
+The environment directory is _either_ declared in the EnvironmentConfig section of the JSON configuration, in which
+case this value is used, or it is the current working directory.
+
+Here's a full example of a configuration: 
+
+```json
+{
+  "Name": "dev",
+  "Environment": {
+    "SubscriptionName": "something you like, not used during yoyo commands",
+    "DefaultDirectoryForEnvironment": "g:/src/quickstart/testing"
+  },
+  "Stacks": [
+    {
+      "ShortName": "app",
+      "DirectoryPath": "example-app",
+      "FullStackName": "test-std-example-app-dev",
+      "DependsOn": ["mssql", "cluster"]
+    },
+    {
+      "ShortName": "mssql",
+      "DirectoryPath": "example-mssql",
+      "FullStackName": "test-std-example-mssql-dev",
+      "DependsOn": ["cluster"]
+    },
+    {
+      "ShortName": "cluster",
+      "DirectoryPath": "example-cluster",
+      "FullStackName": "test-std-cluster-dev"
+    }
+  ]
+}
+```
+
+In this case the default directory for the environment is `g:/src/quickstart/testing` and the environment name is `dev`.
+
+Therefore Yoyo will look in the following locations for the pre-stage scripts:
+
+```
+g:/src/quickstart/testing/.yoyo/dev/app/pre-stage.ps1
+g:/src/quickstart/testing/.yoyo/dev/mssql/pre-stage.ps1
+g:/src/quickstart/testing/.yoyo/dev/cluster/pre-stage.ps1
+```
+
+## Parameters to pre-stage scripts
+
+No parameters are passed to the pre-stage scripts, but they can use environment variables to get information about the stack
+that is being operated on.
+
+The following environment variables are set _in addition to every current environment variable being injected into the script process_:
+
+| Variable                    | Description                         | Example                                  |
+|-----------------------------|-------------------------------------|------------------------------------------|
+| YOYO_STAGE                  | The stage name                      | preview, up, destroy                     |
+| YOYO_STACK_SHORT_NAME       | The short name of the stack         | app, mssql, cluster                      |
+| YOYO_STACK_FULL_STACK_NAME  | The full name of the stack          | test-std-example-app-dev                 |
+| YOYO_OPTION_DRYRUN          | True if the command is a dryrun     | True                                     |
+| YOYO_OPTION_CONFIG          | The path to the config file         | g:/src/quickstart/testing/my-config.json |
+| YOYO_OPTION_FROM_STACK      | The stack to start from             | app, mssql, cluster                      |
+| YOYO_OPTION_TO_STACK        | The stack to finish on              | app, mssql, cluster                      |
+| YOYO_OPTION_VERBOSE         | True if the command is verbose      | True                                     |
+ | YOYO_WORKING_DIRECTORY     | The directory the command is run in | g:/src/quickstart/testing/example-app    |
+

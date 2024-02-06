@@ -1,4 +1,4 @@
-Write-Output "Running pre-stage.ps1 - will check if the cluster is running and start it if not"
+Write-Output "Running pre-stage.ps1 - will check if the cluster is running and start/stop is as required"
 Write-Output "Full stack name: $(${env:YOYO_STACK_FULL_STACK_NAME})"
 
 $ErrorActionPreference = "Stop"
@@ -51,6 +51,14 @@ while($cluster.PowerState.Code -ne $desiredState)
 }
 
 Write-Output "Cluster is now in state: $($cluster.PowerState.Code)"
+
+# if we are doing a "destroy" - and we just stopped the cluster - exit with a 0
+# this will stop the yoyo from processing the job chain, which makes sense because
+# there is no sense trying to pulumi destroy a cluster that is no longer running.
+if ($env:YOYO_STAGE -eq "destroy")
+{
+    exit 0
+}
 
 # if we get here, the cluster is stopped - so exit out with a 100 - this exit
 # code forces the yoyo to continue processing the job chain.

@@ -69,9 +69,13 @@ public class ProcessWithOutputFunctions : IProcess
     public string WorkingDirectory
     {
         get => Process.StartInfo.WorkingDirectory;
-        set => Process.StartInfo.WorkingDirectory = value;
+        set
+        {
+            Process.StartInfo.WorkingDirectory = value;
+            Process.StartInfo.EnvironmentVariables["YOYO_WORKING_DIRECTORY"] = value;
+        }
     }
-    
+
     public void AddOptionsToEnvironment(Options options)
     {
         Options = options;
