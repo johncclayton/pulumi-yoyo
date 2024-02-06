@@ -29,8 +29,6 @@ E.g. something like this, where ``app`` requires ``mssql`` and ``mssql`` require
 Yoyo requires you to name each of your stacks, this makes it much easier to run yoyo commands on any of the stacks
 in the hierarchy.  
 
-```bash
-
 You can use Yoyo to bring the whole lot up in one go.
 
 ```bash
@@ -41,13 +39,13 @@ Would run command: pulumi up --skip-preview -s test-std-example-mssql-dev --non-
 Would run command: pulumi up --skip-preview -s test-std-example-app-dev --non-interactive
 ```
 
-You can also use Yoyo to bring up just the database, notice the use of the short-name "mssql" and the --to-stack option.
+You can also use Yoyo to bring up just the stack called `database`, notice the use of the short-name "mssql" and the --to-stack option.
 
 ```bash
 yoyo up -to mssql
 ```
 
-Or just the cluster, notice the use of the short-name "cluster"
+Or just the `cluster` stack...
 
 ```bash
 yoyo up -to cluster
@@ -78,7 +76,7 @@ that Yoyo can find it.
 The location of the scripts follows this format: 
     
     ```
-    &lt;<environment directory>&gt;.yoyo/&lt;environment name&gt;/&lt;stack short name&gt;/pre-stage.<ps1|bash|python|node>
+    <environment directory>.yoyo/<environment name>/<stack short name>/pre-stage.[ps1|bash|python|node]
     ```
 
 The environment directory is _either_ declared in the EnvironmentConfig section of the JSON configuration, in which
