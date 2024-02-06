@@ -9,6 +9,15 @@ Batteries included:
 - per-project configuration using simple JSON
 - ability to perform pre actions at each level of the stack hierarchy 
 
+## Why?
+
+I found myself writing a lot of scripts to bring up a hierarchy of stacks.  I wanted to be able to bring up the whole
+lot in one go, and also to be able to bring up just a part of the hierarchy. 
+
+## What I'd like 
+
+I would very much appreciate your feedback, even if its something like "finish the install commands please as I want to try this!".
+
 ## Install
 
 Erm.  Right now its check out this code and run it :-)  I'm working on getting it published to nuget (but my eyes
