@@ -84,4 +84,13 @@ public class LinkedProcess : IProcess
     }
     
     public IDictionary<string, string> Environment => FirstProcess.Environment;
+    
+    public StackConfig? Stack { 
+        get => FirstProcess.Stack;
+        set
+        {
+            FirstProcess.Stack = value;
+            ThenProcess.Stack = value;
+        }
+    }
 }

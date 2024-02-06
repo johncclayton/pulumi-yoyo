@@ -37,8 +37,18 @@ public class WithPulumiCommands
     
     private int RunEach(IEnumerable<RunnableFactory.ProcessWrapper> getCommands, Options options, bool reverse = false)
     {
-        foreach (var command in reverse ? getCommands.Reverse() : getCommands)
+        var processWrappers = reverse ? getCommands.Reverse() : getCommands;
+        
+        string? startAtStack = options.FromStack;
+        foreach (var command in processWrappers)
         {
+            if(null != startAtStack && command.process.Stack?.ShortName != startAtStack)
+            {
+                continue;
+            }
+
+            startAtStack = null;
+            
             if(options.DryRun)
             {
                 Console.WriteLine($"Would run command: {command.process}");
@@ -55,6 +65,12 @@ public class WithPulumiCommands
                     Console.WriteLine($"Error running command: {command}");
                     return command.process.ExitCode;
                 }
+            }
+            
+            // if this is the "to" stack, stop here...
+            if(null != options.ToStack && command.process.Stack?.ShortName == options.ToStack)
+            {
+                break;
             }
         }
 

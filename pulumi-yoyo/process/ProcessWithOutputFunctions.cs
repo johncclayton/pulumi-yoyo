@@ -45,6 +45,8 @@ public class ProcessWithOutputFunctions : IProcess
         }
     }
 
+    public StackConfig? Stack { get; set; }
+
     public int ExitCode => Process.ExitCode;
     
     public void Start()
@@ -88,6 +90,7 @@ public class ProcessWithOutputFunctions : IProcess
     
     public void AddStackAndStageToEnvironment(StackConfig stack, Stage stage)
     {
+        Stack = stack;
         Process.StartInfo.EnvironmentVariables["YOYO_STACK_FULL_STACK_NAME"] = stack.FullStackName;
         Process.StartInfo.EnvironmentVariables["YOYO_STACK_SHORT_NAME"] = stack.ShortName;
         Process.StartInfo.EnvironmentVariables["YOYO_STAGE"] = stage.ToString();

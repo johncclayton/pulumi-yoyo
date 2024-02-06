@@ -26,6 +26,11 @@ E.g. something like this, where ``app`` requires ``mssql`` and ``mssql`` require
         └── cluster: test-std-cluster-dev
 ```
 
+Yoyo requires you to name each of your stacks, this makes it much easier to run yoyo commands on any of the stacks
+in the hierarchy.  
+
+```bash
+
 You can use Yoyo to bring the whole lot up in one go.
 
 ```bash
@@ -36,13 +41,13 @@ Would run command: pulumi up --skip-preview -s test-std-example-mssql-dev --non-
 Would run command: pulumi up --skip-preview -s test-std-example-app-dev --non-interactive
 ```
 
-TODO: You can also use Yoyo to bring up just the database
+TODO: You can also use Yoyo to bring up just the database, notice the use of the short-name "mssql"
 
 ```bash
-yoyo up -to database
+yoyo up -to mssql
 ```
 
-TODO: Or just the cluster
+TODO: Or just the cluster, notice the use of the short-name "cluster"
 
 ```bash
 yoyo up -to cluster
@@ -63,6 +68,3 @@ Would run command: pulumi destroy --yes -s test-std-cluster-dev --non-interactiv
 You can!
 
 Lets imagine that I do not want to destroy the cluster, instead I just want to shut it down.  This saves me money, and also time - I don't pay for a running cluster - just the allocated disks.
-
-
-

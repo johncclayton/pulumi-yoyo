@@ -44,4 +44,8 @@ public interface IProcess
     /// Returns the entire environment of the process as a dictionary.
     /// </summary>
     IDictionary<string, string> Environment { get; }
+    /// <summary>
+    /// Property to store the stack that this process is running for.
+    /// </summary>
+    StackConfig? Stack { get; set; }
 }
