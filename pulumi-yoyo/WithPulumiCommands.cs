@@ -22,17 +22,17 @@ public class WithPulumiCommands
 
     public int RunPreviewStage(PreviewOptions options)
     {
-        return RunEach(GetCommands(Stage.Preview), options);
+        return RunEach(GetCommands(Stage.Preview, options), options);
     }
 
     public int RunUpStage(UpOptions options)
     {
-        return RunEach(GetCommands(Stage.Up), options);
+        return RunEach(GetCommands(Stage.Up, options), options);
     }
     
     public int RunDestroyStage(DestroyOptions options)
     {
-        return RunEach(GetCommands(Stage.Destroy), options, reverse: true);
+        return RunEach(GetCommands(Stage.Destroy, options), options, reverse: true);
     }
     
     private int RunEach(IEnumerable<RunnableFactory.ProcessWrapper> getCommands, Options options, bool reverse = false)
@@ -77,7 +77,7 @@ public class WithPulumiCommands
         return 0;
     }
 
-    public IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage)
+    public IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage, Options options)
     {
         foreach (var stack in _execList)
         {
@@ -117,7 +117,7 @@ public class WithPulumiCommands
             // check the yoyo configuration for the pre and post scripts.  If they exist, then we need to run them
             // as well, and then we use a LinkedProcess to chain them together.
             (bool exists, string preScriptPath) = PreScript(stack, stage);
-            if (exists)
+            if (exists && options.UsePreStageScripts)
             {
                 var preTask = RunnableFactory.CreateScriptProcess(preScriptPath, workingDirectory, new string[] {preScriptPath}, (string msg) =>
                 {

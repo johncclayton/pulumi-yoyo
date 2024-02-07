@@ -13,7 +13,10 @@ public class Options
     [Option('t', "to-stack", Required = false, HelpText = "Deploy up to this stack short name, and no further")]
     public string? ToStack { get; set; }
     
-    [Option("dry-run", Required = false, Default = false, HelpText = "Just print what would be done, but don't actually do it.")]
+    [Option('p', "pre-stage", Required = false, Default = false, HelpText = "Use the pre-stage scripts as well - by default these are ignored.")]
+    public bool UsePreStageScripts { get; set; }
+    
+    [Option('d', "dry-run", Required = false, Default = false, HelpText = "Just print what would be done, but don't actually do it.")]
     public bool DryRun { get; set; }
     
     [Option('v', "verbose", Required = false, Default = false, HelpText = "Print verbose logging information during the operation")]
