@@ -11,7 +11,7 @@ Batteries included:
 
 ## Why?
 
-I found myself writing a lot of scripts to bring up a hierarchy of stacks.  I wanted to be able to bring up the whole
+I found myself writing scripts to bring up a hierarchy of stacks.  I wanted to be able to bring up the whole
 lot in one go, and also to be able to bring up just a part of the hierarchy. 
 
 ## What I'd like 
