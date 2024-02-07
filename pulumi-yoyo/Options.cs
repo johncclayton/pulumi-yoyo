@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using CommandLine;
 namespace pulumi_yoyo;
 
@@ -21,6 +22,34 @@ public class Options
     
     [Option('v', "verbose", Required = false, Default = false, HelpText = "Print verbose logging information during the operation")]
     public bool Verbose { get; set; }
+    
+    public Options OverrideOptionsUsingEnv()
+    {
+        foreach (var property in GetType().GetProperties())
+        {
+            var attrs = property.GetCustomAttributes(typeof(OptionAttribute), false);
+            if (attrs.Length == 0)
+            {
+                continue;
+            }
+            
+            var optionAttr = attrs[0] as OptionAttribute;
+            if (optionAttr is null)
+            {
+                continue;
+            }
+            
+            var name = optionAttr.LongName.ToUpper().Replace("-", "_");
+            var value = Environment.GetEnvironmentVariable("YOYO_OPTION_" + name);
+            if (value != null)
+            {
+                property.SetValue(this, Convert.ChangeType(value, property.PropertyType));
+            }
+        }
+
+        return this;
+    }
+
 }
 
 [Verb("preview", HelpText = "Run a pulumi preview command against all the stacks in the project")]
