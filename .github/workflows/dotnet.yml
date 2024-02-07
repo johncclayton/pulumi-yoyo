@@ -7,6 +7,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
+    types: [closed]
     branches: [ "main" ]
 
 jobs:
@@ -23,7 +24,15 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c Release
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal -c Release
+    - name: Publish to NuGet
+      run: |
+        for pkg in ./pulumi-yoyo/nupkg/*.nupkg; do
+          echo "Doing package: $pkg"
+          dotnet nuget push $pkg --skip-duplicate --no-symbols --api-key ${NUGET_API_KEY}  
+        done
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     
