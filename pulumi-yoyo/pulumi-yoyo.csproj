@@ -8,7 +8,9 @@
     <TargetFrameworks>net7.0;net8.0;net6.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>yoyo</ToolCommandName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>./nupkg</PackageOutputPath>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.1</Version>
     <Description>Yoyo - bring your Pulumi stacks up and down in one go, as a unit</Description>
   </PropertyGroup>
@@ -23,6 +25,10 @@
     <PackageReference Include="Spectre.Console" Version="0.48.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="api\" />
     <Folder Include="nupkg\" />
