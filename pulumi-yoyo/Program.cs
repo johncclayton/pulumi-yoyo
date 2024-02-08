@@ -3,7 +3,29 @@ using dotenv.net;
 using pulumi_yoyo;
 using pulumi_yoyo.config;
 
-DotEnv.Fluent().Load();
+string[] GetEnvFilePaths(int limit = 5)
+{
+    var filePaths = new List<string>();
+    var currentDir = Directory.GetCurrentDirectory();
+    var currentDirInfo = new DirectoryInfo(currentDir);
+    var currentDirPath = currentDirInfo.FullName;
+    var currentDirPathParts = currentDirPath.Split(Path.DirectorySeparatorChar);
+    var currentDirPathPartsCount = currentDirPathParts.Length;
+    
+    for (var i = 0; i < currentDirPathPartsCount; i++)
+    {
+        var path = Path.Combine(currentDirPathParts.Take(currentDirPathPartsCount - i).ToArray());
+        var envFilePath = Path.Combine(path, ".env");
+        if (File.Exists(envFilePath))
+        {
+            filePaths.Add(envFilePath);
+        }
+    }
+
+    return filePaths.ToArray();
+}
+
+DotEnv.Load(options: new DotEnvOptions(envFilePaths: GetEnvFilePaths(), trimValues: true, overwriteExistingVars: true));
 
 var yoyoProjectFile = Environment.GetEnvironmentVariable("YOYO_PROJECT_PATH");
 if(yoyoProjectFile is null)

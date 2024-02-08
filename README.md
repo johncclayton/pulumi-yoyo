@@ -1,6 +1,6 @@
 ﻿# Pulumi YOYO
 
-A wrapper around your existing Pulumi CLI (and Automation API) tools that helps you to up/destroy a hierarchy of
+A wrapper around your existing Pulumi CLI tools that helps you to up/destroy a hierarchy of
 Pulumi Stacks together in a single command.
 
 Batteries included:
@@ -20,10 +20,11 @@ I would very much appreciate your feedback, even if its something like "finish t
 
 ## Install
 
-Erm.  Right now its check out this code and run it :-)  I'm working on getting it published to nuget (but my eyes
-are tired). 
+You can install the tool from nuget (as a global exe/command) using the following :
 
-[//]: # (dotnet tool install --global Pulumi.Yoyo)
+```bash
+$ dotnet tool install --global Pulumi.Yoyo
+```
 
 ## Usage
 
@@ -51,16 +52,16 @@ Would run command: pulumi up --skip-preview -s test-std-example-mssql-dev --non-
 Would run command: pulumi up --skip-preview -s test-std-example-app-dev --non-interactive
 ```
 
-You can also use Yoyo to bring up just the stack called `database`, notice the use of the short-name "mssql" and the --to-stack option.
+You can also use Yoyo to bring up just the stack called `mssql`, notice the use of the short-name "mssql" and the --to-stack option.
 
 ```bash
-yoyo up -to mssql
+yoyo up -to-stack mssql
 ```
 
 Or just the `cluster` stack...
 
 ```bash
-yoyo up -to cluster
+yoyo up -to-stack cluster
 ```
 
 Or destroy the whole lot
@@ -92,7 +93,7 @@ command should be run.
 ## How it works
 
 Yoyo will look for scripts (see below for the names/locations).  If the scripts are found, then they are executed before the
-Pulumi command is run.
+Pulumi command is run, but only if the command line option '--pre-stage' is used.
 
 Depending on the exit code of the script, the stages Pulumi command will be run (or not).    
 
