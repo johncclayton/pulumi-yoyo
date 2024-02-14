@@ -7,8 +7,8 @@ public class WithPulumiCommandsTests
 
     public WithPulumiCommandsTests()
     {
-        var data = File.ReadAllText("../../../test-projectconfig-deserialize.json");
-        _projectConfiguration = ProjectConfiguration.ReadFromData(data);
+        var data = "../../../test-projectconfig-deserialize.json";
+        _projectConfiguration = ProjectConfiguration.ReadFromFromFile(data);
         Assert.NotNull(_projectConfiguration);
     }
     

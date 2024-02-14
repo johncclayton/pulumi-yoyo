@@ -48,6 +48,8 @@ if (projectConfig is null)
     return;
 }
 
+projectConfig.ResolveDefaultPathForRelativeReferences(yoyoProjectFile);
+
 // var pulumiAccessToken = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ACCESS_TOKEN");
 // var pulumiOrg = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ORG", "soxes");
 // if (pulumiAccessToken is null)
