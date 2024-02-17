@@ -147,7 +147,7 @@ always relative to the location of the YoYo JSON configuration file.
 {
   "Name": "dev",
   "Environment": {
-    "SubscriptionName": "something you like, not used during yoyo commands"
+    "Description": "something you like, not used during yoyo commands"
   },
   "Stacks": [
     {
@@ -177,7 +177,7 @@ always relative to the location of the YoYo JSON configuration file.
 The name of the environment.  This is used to find the correct environment configuration when running yoyo commands.  It is also used to find the correct pre-stage scripts.
 
 ### Environment
-The environment configuration.  It is also used to set the subscription name for the environment.  The subscription name is not used by Yoyo, but is useful for documentation purposes.
+The environment configuration.  It is also used to set the descriptive name for the environment - which is not used by Yoyo but is useful for documentation purposes.
 
 ### Stacks
 The list of stacks that are part of the environment.  Each stack has a short name, a directory path and a full stack name.  The short name is used to identify the stack in yoyo commands.  The directory path is used to find the stack on the file system, relative to the YoYo JSON configuration file.  

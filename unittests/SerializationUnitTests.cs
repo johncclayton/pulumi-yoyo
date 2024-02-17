@@ -18,7 +18,7 @@ public class SerializationUnitTests
         
         Assert.Equal("test", obj.Name);
         Assert.Equal(4, obj.Stacks.Count);
-        Assert.Equal("wahaay", obj.Environment.SubscriptionName);
+        Assert.Equal("wahaay", obj.Environment.Description);
         
         var stack = obj.Stacks[0];
         Assert.Equal("cluster", stack.ShortName);

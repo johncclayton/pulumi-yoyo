@@ -1,7 +1,7 @@
 {
   "Name": "test",
   "Environment": {
-    "SubscriptionName": "wahaay"
+    "Description": "wahaay"
   },
   "Stacks": [
     {
