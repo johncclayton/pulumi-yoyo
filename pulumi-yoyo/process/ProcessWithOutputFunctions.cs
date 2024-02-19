@@ -91,7 +91,7 @@ public class ProcessWithOutputFunctions : IProcess
         }
     }
     
-    public void AddStackAndStageToEnvironment(StackConfig stack, Stage stage)
+    public void AddStackAndStageToEnvironmentVariables(StackConfig stack, Stage stage)
     {
         Stack = stack;
         Process.StartInfo.EnvironmentVariables["YOYO_STACK_FULL_STACK_NAME"] = stack.FullStackName;

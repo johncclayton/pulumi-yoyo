@@ -31,7 +31,7 @@ public interface IProcess
     /// </summary>
     /// <param name="stack">The stack to add</param>
     /// <param name="stage">The stage being run</param>
-    void AddStackAndStageToEnvironment(StackConfig stack, Stage stage);
+    void AddStackAndStageToEnvironmentVariables(StackConfig stack, Stage stage);
     /// <summary>
     /// Adds the options to the environment, the format is as follows:
     /// YOYO_OPTION_&lt;PROPERTY NAME&gt;: The value of the property

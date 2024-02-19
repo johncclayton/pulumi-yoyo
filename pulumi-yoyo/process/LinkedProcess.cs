@@ -71,10 +71,10 @@ public class LinkedProcess : IProcess
         }
     }
     
-    public void AddStackAndStageToEnvironment(StackConfig stack, Stage stage)
+    public void AddStackAndStageToEnvironmentVariables(StackConfig stack, Stage stage)
     {
-        FirstProcess.AddStackAndStageToEnvironment(stack, stage);
-        ThenProcess.AddStackAndStageToEnvironment(stack, stage);
+        FirstProcess.AddStackAndStageToEnvironmentVariables(stack, stage);
+        ThenProcess.AddStackAndStageToEnvironmentVariables(stack, stage);
     }
 
     public void AddOptionsToEnvironment(Options options)

@@ -26,7 +26,7 @@ public class ProjectConfiguration
         return DirectoryPathForStack(forStack.DirectoryPath);
     }
     
-    public string DirectoryPathForStack(string? directoryPath)
+    public string DirectoryPathForStack(string directoryPath)
     {
         return Path.Combine(DefaultPathForRelativeReferences ?? Directory.GetCurrentDirectory(), directoryPath);
     }
