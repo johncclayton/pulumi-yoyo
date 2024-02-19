@@ -31,8 +31,8 @@ if (yoyoProjectFile is null)
     return;
 }
 
-bool found = false;
-if (!File.Exists(yoyoProjectFile))
+bool found = File.Exists(yoyoProjectFile);
+if (!found)
 {
     // of course, envFilePaths is where we need to be looking, walk up this chain
     // from end to top.
@@ -43,11 +43,15 @@ if (!File.Exists(yoyoProjectFile))
         {
             var yoyoAbsProjectPath = Path.GetFullPath(
                 Path.Combine(directoryForEnvFile, yoyoProjectFile));
-            if (File.Exists(yoyoAbsProjectPath))
-                found = true;
+            found = File.Exists(yoyoAbsProjectPath);
         }
+        else
+            break;
     }
-    
+}
+
+if(!found)
+{
     Console.WriteLine("The YOYO_PROJECT_PATH file does not exist - cannot continue.");
     return;
 }
