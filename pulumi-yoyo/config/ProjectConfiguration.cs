@@ -3,12 +3,13 @@ using System.Text.Json;
 
 namespace pulumi_yoyo.config;
 
-public record ProjectConfiguration(
-    string Name,
-    EnvironmentConfig Environment,
-    IList<StackConfig> Stacks
-)
+public class ProjectConfiguration
 {
+    public string Name { get; init; } = "";
+    public EnvironmentConfig? Environment { get; init; }
+    public string? DefaultPathForRelativeReferences { get; set; }
+    public IList<StackConfig> Stacks { get; init; } = new List<StackConfig>();
+
     public static ProjectConfiguration? ReadFromFromFile(string yoyoProjectFile)
     {
         return ReadFromData(File.ReadAllText(yoyoProjectFile));
@@ -22,9 +23,24 @@ public record ProjectConfiguration(
     
     public string DirectoryPathForStack(StackConfig forStack)
     {
-        // if the path is defined - use it
-        var directoryPath = Environment.DefaultDirectoryForEnvironment ?? Directory.GetCurrentDirectory();
-        return Path.Combine(directoryPath, forStack.DirectoryPath);
+        return DirectoryPathForStack(forStack.DirectoryPath);
+    }
+    
+    public string DirectoryPathForStack(string directoryPath)
+    {
+        return Path.Combine(DefaultPathForRelativeReferences ?? Directory.GetCurrentDirectory(), directoryPath);
+    }
+
+    public bool ResolveDefaultPathForRelativeReferences(string configurationFile)
+    {
+        var dirOfConfigFile = Path.GetDirectoryName(configurationFile);
+        if (null != dirOfConfigFile)
+        {
+            DefaultPathForRelativeReferences = dirOfConfigFile;
+            return true;
+        }
+
+        return false;
     }
 
 }

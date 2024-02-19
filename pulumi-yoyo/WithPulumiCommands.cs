@@ -1,10 +1,10 @@
 ﻿using config;
-using pulumi_yoyo.api;
 using pulumi_yoyo.config;
 using pulumi_yoyo.process;
 using QuikGraph;
 using QuikGraph.Algorithms.Search;
 using Spectre.Console;
+using System.Linq;
 
 namespace pulumi_yoyo;
 
@@ -77,26 +77,17 @@ public class WithPulumiCommands
 
     public IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage, Options options)
     {
-        // if we find -s or --stack - the user wants just one specific stack, 
-        // and might use the name of a yoyo stack, in which case replace it with the name 
-        // of the real stack and ONLY use this stack. 
         IList<StackConfig> stacksToProcess = _execList;
         
-        if (options.args != null)
-            for (var index = 0; index < options.args.Length; ++index)
-            {
-                var theVar = options.args[index];
-                if (theVar == "-s" || theVar == "--stack")
-                {
-                    var matchingStackRef = _execList.FirstOrDefault(s => s.ShortName == options.args[index + 1]);
-                    if (matchingStackRef != null)
-                    {
-                        stacksToProcess = new List<StackConfig>();
-                        stacksToProcess.Add(matchingStackRef);
-                    }
-                }
-            }
-
+        // if we find -s or --stack - the user wants just one specific stack, 
+        // and they might use the name of a yoyo stack, in which case replace it with the name 
+        // of the real stack and ONLY use this stack. 
+        var stackTarget = StripStackTargetFromCommandLineArguments(stage, options);
+        if (stackTarget != null)
+        {
+            stacksToProcess = new List<StackConfig>() { stackTarget };
+        }
+        
         foreach (var stack in stacksToProcess)
         {
             var workingDirectory = _commandIterator.Configuration.DirectoryPathForStack(stack);
@@ -120,7 +111,12 @@ public class WithPulumiCommands
 
             // by default, create a pulumi command.
             pulumiArgs.AddRange(new[] { "-s", $"{stack.FullStackName}", "--non-interactive" });
-
+            // now jam on all the other args the user specified... here's hoping. 
+            if (null != options.args)
+            {
+                pulumiArgs.AddRange(options.args);
+            }
+            
             var pulumiTask = RunnableFactory.CreatePulumiProcess(workingDirectory, pulumiArgs, msg =>
             {
                 Console.WriteLine(msg);
@@ -131,7 +127,7 @@ public class WithPulumiCommands
                 return false;
             });
 
-            pulumiTask.AddStackAndStageToEnvironment(stack, stage);
+            pulumiTask.AddStackAndStageToEnvironmentVariables(stack, stage);
 
             IProcess actualTask;
 
@@ -151,7 +147,7 @@ public class WithPulumiCommands
                         return false;
                     });
 
-                preTask.AddStackAndStageToEnvironment(stack, stage);
+                preTask.AddStackAndStageToEnvironmentVariables(stack, stage);
 
                 actualTask = new LinkedProcess(preTask, pulumiTask);
             }
@@ -162,6 +158,29 @@ public class WithPulumiCommands
 
             yield return new RunnableFactory.ProcessWrapper(actualTask, true);
         }
+    }
+    
+    private StackConfig? StripStackTargetFromCommandLineArguments(Stage stage, Options options)
+    {
+        if (null == options.args) return null;
+
+        string[] copiedArgs = options.args.Clone() as string[] ?? Array.Empty<string>();
+        for (var index = 0; index < copiedArgs.Length; ++index)
+        {
+            var theVar = copiedArgs[index];
+            if ((theVar == "-s" || theVar == "--stack") && index + 1 < copiedArgs.Length)
+            {
+                var theStack = _execList.FirstOrDefault(s => s.ShortName == copiedArgs[index + 1]);
+                if (null != theStack)
+                {
+                    // now we adjust the options.args - to REMOVE the "-s" / "--stack" + arg part
+                    options.args = options.args.Where((val, idx) => idx != index && idx != index + 1).ToArray();
+                    return theStack;    
+                }
+            }
+        }
+
+        return null;
     }
 
     private (bool exists, string preScriptPath) PreScript(StackConfig stack, Stage stage)

@@ -1,11 +1,12 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using CommandLine;
 namespace pulumi_yoyo;
 
 public class Options
 {
-    public string[]? args;
+    public string[]? args { get; set; }
     
     [Option('c', "config", Required = false, HelpText = "Path to the project configuration file, by default yoyo will look for a .env file containing YOYO_PROJECT_PATH, but you can override this behaviour by using this flag.")]
     public string? ConfigFile { get; set; }
@@ -52,25 +53,33 @@ public class Options
         return this;
     }
 
+    public void SetArgumentsAndStripCommandWord(string[] newArgs, string word)
+    {
+        args = newArgs.Where(val => val != word).ToArray();
+    }
+}
+
+public class StackBasedOptions : Options
+{
 }
 
 [Verb("preview", HelpText = "Run a pulumi preview command against all the stacks in the project")]
-public class PreviewOptions : Options 
+public class PreviewOptions : StackBasedOptions 
 {
 }
 
 [Verb("stack", HelpText = "Operate on the stack, you can specify the stack with the name of the YoYo stack and this will be replaced with the actual stack name")]
-public class StackOptions : Options 
+public class StackOptions : StackBasedOptions 
 {
 }
 
 [Verb("up", HelpText = "Run a pulumi up command against all the stacks in the project")]
-public class UpOptions : Options
+public class UpOptions : StackBasedOptions
 {
 }
 
 [Verb(name: "destroy", aliases: new string[] {"delete", "down"}, HelpText = "Run a pulumi destroy command against all the stacks in the project")]
-public class DestroyOptions : Options
+public class DestroyOptions : StackBasedOptions
 {
 }
 

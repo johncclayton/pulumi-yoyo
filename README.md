@@ -136,17 +136,18 @@ Yoyo configuration is just a plain boring JSON file.  Nothing more.  No fancy DS
 
 The configuration file is used to :
 1. give short names to each stack definition.
-2. tell Yoyo where on your file system the stack resides.
-3. tell Yoyo the full name of the stack that should be operated on.
+2. tell Yoyo the full name of the stack that should be operated on.
 
 Here's a full example of a configuration - hopefully this is reasonably clear.   
+
+This JSON file is then placed in the directory _where the stack files & code are_.  The ``DirectoryPath`` is 
+always relative to the location of the YoYo JSON configuration file.
 
 ```json
 {
   "Name": "dev",
   "Environment": {
-    "SubscriptionName": "something you like, not used during yoyo commands",
-    "DefaultDirectoryForEnvironment": "g:/src/quickstart/testing"
+    "Description": "something you like, not used during yoyo commands"
   },
   "Stacks": [
     {
@@ -176,10 +177,12 @@ Here's a full example of a configuration - hopefully this is reasonably clear.
 The name of the environment.  This is used to find the correct environment configuration when running yoyo commands.  It is also used to find the correct pre-stage scripts.
 
 ### Environment
-The environment configuration.  This is used to set the default directory for the environment.  It is also used to set the subscription name for the environment.  The subscription name is not used by Yoyo, but is useful for documentation purposes.
+The environment configuration.  It is also used to set the descriptive name for the environment - which is not used by Yoyo but is useful for documentation purposes.
 
 ### Stacks
-The list of stacks that are part of the environment.  Each stack has a short name, a directory path and a full stack name.  The short name is used to identify the stack in yoyo commands.  The directory path is used to find the stack on the file system.  The full stack name is used to identify the stack in pulumi commands.  The depends on list is used to determine the order in which the stacks should be operated on.  This is useful for example when bringing up a stack hierarchy, where one stack depends on another.
+The list of stacks that are part of the environment.  Each stack has a short name, a directory path and a full stack name.  The short name is used to identify the stack in yoyo commands.  The directory path is used to find the stack on the file system, relative to the YoYo JSON configuration file.  
+The full stack name is used to identify the stack in pulumi commands.  The depends on list is used to determine the order in which the stacks should be operated on.  This is
+useful for example when bringing up a stack hierarchy, where one stack depends on another.
 
 ## Parameters to pre-stage scripts
 

@@ -57,7 +57,7 @@ if (!found)
 
 if(!found)
 {
-    Console.WriteLine("The YOYO_PROJECT_PATH file does not exist - cannot continue.");
+    Console.WriteLine($"The YOYO_PROJECT_PATH file '{yoyoProjectFile}' does not exist - cannot continue.");
     return;
 }
 
@@ -68,6 +68,8 @@ if (projectConfig is null)
     Console.WriteLine("The project file does not contain a valid project configuration - cannot continue.");
     return;
 }
+
+projectConfig.ResolveDefaultPathForRelativeReferences(yoyoProjectFile);
 
 // var pulumiAccessToken = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ACCESS_TOKEN");
 // var pulumiOrg = EnvReaderExtensions.GetOptionalStringValue("PULUMI_ORG", "soxes");
@@ -81,26 +83,34 @@ if (projectConfig is null)
 
 var cmds = new WithPulumiCommands(projectConfig);
 
-Parser.Default.ParseArguments<PreviewOptions, StackOptions, UpOptions,
+var parser = new Parser(settings =>
+{
+    settings.IgnoreUnknownArguments = true;
+    settings.AutoHelp = true;
+});
+
+parser.ParseArguments<PreviewOptions, StackOptions, UpOptions,
         DestroyOptions, ShowOptions>(args)
     .WithParsed<PreviewOptions>(options =>
     {
-        options.args = args;
+        options.SetArgumentsAndStripCommandWord(args, "preview");
         cmds.RunPreviewStage(options);
     })
     .WithParsed<UpOptions>(options =>
     {
-        options.args = args;
+        options.SetArgumentsAndStripCommandWord(args, "up");
         cmds.RunUpStage(options);
     })
     .WithParsed<DestroyOptions>(options =>
     {
-        options.args = args;
+        options.SetArgumentsAndStripCommandWord(args, "destroy");
+        if(null != options.args)
+            options.SetArgumentsAndStripCommandWord(options.args, "down");
         cmds.RunDestroyStage(options);
     })
     .WithParsed<StackOptions>(options =>
     {
-        options.args = args;
+        options.SetArgumentsAndStripCommandWord(args, "stack");
         cmds.RunStackStage(options);
     })
     .WithParsed<ShowOptions>(options => { cmds.ShowViaSpectre(); })

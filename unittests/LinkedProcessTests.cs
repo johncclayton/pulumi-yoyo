@@ -44,7 +44,7 @@ namespace unittests
             sampleOptions.ConfigFile = "configfile";
             sampleOptions.DryRun = true;
             
-            linkedProcess.AddStackAndStageToEnvironment(test, Stage.Up);
+            linkedProcess.AddStackAndStageToEnvironmentVariables(test, Stage.Up);
             linkedProcess.AddOptionsToEnvironment(sampleOptions);
 
             var theEnvironment = linkedProcess.Environment;

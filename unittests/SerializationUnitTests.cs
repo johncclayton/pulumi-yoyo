@@ -8,8 +8,8 @@ public class SerializationUnitTests
     [Fact]
     public void TestCanSerializeConfiguration()
     {
-        var data = File.ReadAllText("../../../test-projectconfig-deserialize.json");
-        ProjectConfiguration? obj = ProjectConfiguration.ReadFromData(data);
+        var data = "../../../test-projectconfig-deserialize.json";
+        ProjectConfiguration? obj = ProjectConfiguration.ReadFromFromFile(data);
         
         Assert.NotNull(obj);
         Assert.NotNull(obj.Environment);
@@ -18,7 +18,7 @@ public class SerializationUnitTests
         
         Assert.Equal("test", obj.Name);
         Assert.Equal(4, obj.Stacks.Count);
-        Assert.Equal("wahaay", obj.Environment.SubscriptionName);
+        Assert.Equal("wahaay", obj.Environment.Description);
         
         var stack = obj.Stacks[0];
         Assert.Equal("cluster", stack.ShortName);
