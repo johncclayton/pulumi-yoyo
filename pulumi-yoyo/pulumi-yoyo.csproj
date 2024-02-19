@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Description>Yoyo - bring your Pulumi stacks up and down in one go, as a unit</Description>
   </PropertyGroup>
 
