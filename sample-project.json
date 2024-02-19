@@ -1,8 +1,8 @@
 {
   "Name": "dev",
   "Environment": {
-    "SubscriptionName": "wahaay",
-    "DefaultDirectoryForEnvironment": "g:/soxes/quickstart/testing"
+    "Description": "wahaay"
+    
   },
   "Stacks": [
     {

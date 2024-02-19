@@ -4,5 +4,7 @@ public enum Stage
 {
     Preview,
     Up,
-    Destroy
+    Destroy,
+    Stack,
+    Refresh
 }

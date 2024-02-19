@@ -5,6 +5,8 @@ namespace pulumi_yoyo;
 
 public class Options
 {
+    public string[]? args;
+    
     [Option('c', "config", Required = false, HelpText = "Path to the project configuration file, by default yoyo will look for a .env file containing YOYO_PROJECT_PATH, but you can override this behaviour by using this flag.")]
     public string? ConfigFile { get; set; }
     
@@ -54,6 +56,11 @@ public class Options
 
 [Verb("preview", HelpText = "Run a pulumi preview command against all the stacks in the project")]
 public class PreviewOptions : Options 
+{
+}
+
+[Verb("stack", HelpText = "Operate on the stack, you can specify the stack with the name of the YoYo stack and this will be replaced with the actual stack name")]
+public class StackOptions : Options 
 {
 }
 

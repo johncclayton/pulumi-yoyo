@@ -6,36 +6,48 @@ using pulumi_yoyo.config;
 string[] GetEnvFilePaths(int limit = 5)
 {
     var filePaths = new List<string>();
-    var currentDir = Directory.GetCurrentDirectory();
-    var currentDirInfo = new DirectoryInfo(currentDir);
-    var currentDirPath = currentDirInfo.FullName;
-    var currentDirPathParts = currentDirPath.Split(Path.DirectorySeparatorChar);
-    var currentDirPathPartsCount = currentDirPathParts.Length;
-    
-    for (var i = 0; i < currentDirPathPartsCount; i++)
+    string? currentDir = Directory.GetCurrentDirectory();
+    while(null != currentDir)
     {
-        var path = Path.Combine(currentDirPathParts.Take(currentDirPathPartsCount - i).ToArray());
-        var envFilePath = Path.Combine(path, ".env");
+        var envFilePath = Path.Combine(currentDir, ".env");
         if (File.Exists(envFilePath))
         {
             filePaths.Add(envFilePath);
         }
+
+        currentDir = Path.GetDirectoryName(currentDir);
     }
 
     return filePaths.ToArray();
 }
 
-DotEnv.Load(options: new DotEnvOptions(envFilePaths: GetEnvFilePaths(), trimValues: true, overwriteExistingVars: true));
+var envFilePaths = GetEnvFilePaths();
+DotEnv.Load(new DotEnvOptions(envFilePaths: envFilePaths, trimValues: true, overwriteExistingVars: true));
 
 var yoyoProjectFile = Environment.GetEnvironmentVariable("YOYO_PROJECT_PATH");
-if(yoyoProjectFile is null)
+if (yoyoProjectFile is null)
 {
     Console.WriteLine("YOYO_PROJECT_PATH is not set - cannot continue.");
     return;
 }
 
+bool found = false;
 if (!File.Exists(yoyoProjectFile))
 {
+    // of course, envFilePaths is where we need to be looking, walk up this chain
+    // from end to top.
+    foreach (var envFilePathName in envFilePaths.Reverse())
+    {
+        var directoryForEnvFile = Path.GetDirectoryName(envFilePathName);
+        if (null != directoryForEnvFile)
+        {
+            var yoyoAbsProjectPath = Path.GetFullPath(
+                Path.Combine(directoryForEnvFile, yoyoProjectFile));
+            if (File.Exists(yoyoAbsProjectPath))
+                found = true;
+        }
+    }
+    
     Console.WriteLine("The YOYO_PROJECT_PATH file does not exist - cannot continue.");
     return;
 }
@@ -60,36 +72,27 @@ if (projectConfig is null)
 
 var cmds = new WithPulumiCommands(projectConfig);
 
-Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions, ShowOptions>(args)
+Parser.Default.ParseArguments<PreviewOptions, StackOptions, UpOptions,
+        DestroyOptions, ShowOptions>(args)
     .WithParsed<PreviewOptions>(options =>
     {
+        options.args = args;
         cmds.RunPreviewStage(options);
     })
     .WithParsed<UpOptions>(options =>
     {
+        options.args = args;
         cmds.RunUpStage(options);
     })
     .WithParsed<DestroyOptions>(options =>
     {
+        options.args = args;
         cmds.RunDestroyStage(options);
     })
-    .WithParsed<ShowOptions>(options =>
+    .WithParsed<StackOptions>(options =>
     {
-        cmds.ShowViaSpectre();
+        options.args = args;
+        cmds.RunStackStage(options);
     })
+    .WithParsed<ShowOptions>(options => { cmds.ShowViaSpectre(); })
     ;
-
-// next step: use the PulumiController to: 
-// 1. check if the stack is already deployed - perhaps the cluster is not started, so start it? 
-// 2. pulumi up if not deployed
-
-// when doing pulumi up, we need to know to "where" along the hierarchy path we need to go.  
-// e.g. mssql does not deploy app
-// 1. by default we deploy everything. 
-// 2. must also be an option to skip the hierarchy steps and just pulumi up the stack we are dealing with (e.g. app) 
-
-// examples: 
-// yoyo up --name app --skip-hierarchy (-s)
-// yoyo up --to mssql 
-// yoyo down (defaults to everything)
-// yoyo down --stop-at cluster (apps and mssql are destroyed, cluster is left running)
