@@ -44,6 +44,11 @@ if (!found)
             var yoyoAbsProjectPath = Path.GetFullPath(
                 Path.Combine(directoryForEnvFile, yoyoProjectFile));
             found = File.Exists(yoyoAbsProjectPath);
+            if (found)
+            {
+                yoyoProjectFile = yoyoAbsProjectPath;
+                break;
+            }
         }
         else
             break;
