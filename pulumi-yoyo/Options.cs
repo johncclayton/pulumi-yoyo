@@ -57,6 +57,11 @@ public class PreviewOptions : Options
 {
 }
 
+[Verb("output", HelpText = "Show stack outputs")]
+public class OutputOptions : Options 
+{
+}
+
 [Verb("up", HelpText = "Run a pulumi up command against all the stacks in the project")]
 public class UpOptions : Options
 {

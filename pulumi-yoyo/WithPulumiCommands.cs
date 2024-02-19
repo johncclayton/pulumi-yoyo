@@ -28,6 +28,11 @@ public class WithPulumiCommands
         return RunEach(GetCommands(Stage.Up, options), options);
     }
 
+    public int RunOutputsStage(OutputOptions options)
+    {
+        return RunEach(GetCommands(Stage.Outputs, options), options);
+    }
+    
     public int RunDestroyStage(DestroyOptions options)
     {
         return RunEach(GetCommands(Stage.Destroy, options), options, reverse: true);
@@ -84,6 +89,9 @@ public class WithPulumiCommands
             var pulumiArgs = new List<string>();
             switch (stage)
             {
+                case Stage.Outputs:
+                    pulumiArgs.AddRange(new string[] { "stack", "output", "--show-secrets" });
+                    break;
                 case Stage.Preview:
                     pulumiArgs.AddRange(new string[] { "preview" });
                     break;
@@ -96,7 +104,7 @@ public class WithPulumiCommands
             }
 
             // by default, create a pulumi command.
-            pulumiArgs.AddRange(new string[] { "-s", $"{stack.FullStackName}", "--non-interactive" });
+            pulumiArgs.AddRange(new string[] { "-s", $"{stack.FullStackName}" });
 
             var pulumiTask = RunnableFactory.CreatePulumiProcess(workingDirectory, pulumiArgs, (string msg) =>
             {
@@ -206,4 +214,5 @@ public class WithPulumiCommands
 
         AnsiConsole.Write(tree);
     }
+
 }

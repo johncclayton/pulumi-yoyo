@@ -67,6 +67,10 @@ Parser.Default.ParseArguments<PreviewOptions, UpOptions, DestroyOptions, ShowOpt
     {
         cmds.RunPreviewStage(options);
     })
+    .WithParsed<OutputOptions>(options =>
+    {
+        cmds.RunOutputsStage(options);
+    })
     .WithParsed<UpOptions>(options =>
     {
         cmds.RunUpStage(options);
