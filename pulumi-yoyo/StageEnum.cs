@@ -5,5 +5,6 @@ public enum Stage
     Preview,
     Up,
     Destroy,
-    Outputs
+    Stack,
+    Refresh
 }
