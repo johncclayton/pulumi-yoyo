@@ -8,7 +8,7 @@ public class ProjectConfiguration
     public string Name { get; init; } = "";
     public EnvironmentConfig? Environment { get; init; }
     public string? DefaultPathForRelativeReferences { get; set; }
-    public IList<StackConfig> Stacks { get; init; } = new List<StackConfig>();
+    public IList<StackConfig>? Stacks { get; init; } = new List<StackConfig>();
 
     public static ProjectConfiguration? ReadFromFromFile(string yoyoProjectFile)
     {
@@ -26,9 +26,9 @@ public class ProjectConfiguration
         return DirectoryPathForStack(forStack.DirectoryPath);
     }
     
-    public string DirectoryPathForStack(string directoryPath)
+    public string DirectoryPathForStack(string? directoryPath)
     {
-        return Path.Combine(DefaultPathForRelativeReferences ?? Directory.GetCurrentDirectory(), directoryPath);
+        return Path.Combine(DefaultPathForRelativeReferences ?? Directory.GetCurrentDirectory(), directoryPath!);
     }
 
     public bool ResolveDefaultPathForRelativeReferences(string configurationFile)

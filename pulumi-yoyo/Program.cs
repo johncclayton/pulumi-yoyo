@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using config;
 using dotenv.net;
 using pulumi_yoyo;
 using pulumi_yoyo.config;
@@ -89,29 +90,38 @@ var parser = new Parser(settings =>
     settings.AutoHelp = true;
 });
 
-parser.ParseArguments<PreviewOptions, StackOptions, UpOptions,
-        DestroyOptions, ShowOptions>(args)
-    .WithParsed<PreviewOptions>(options =>
+parser.ParseArguments<CleanupOptions, ShowOptions>(args)
+    .WithParsed<CleanupOptions>(options =>
     {
-        options.SetArgumentsAndStripCommandWord(args, "preview");
-        cmds.RunPreviewStage(options);
+        options.SetArgumentsAndStripCommandWord(args, "cleanup");
+        cmds.RunCleanupStage(options);
     })
-    .WithParsed<UpOptions>(options =>
+    // .WithParsed<PreviewOptions>(options =>
+    // {
+    //     options.SetArgumentsAndStripCommandWord(args, "preview");
+    //     cmds.RunPreviewStage(options);
+    // })
+    // .WithParsed<UpOptions>(options =>
+    // {
+    //     options.SetArgumentsAndStripCommandWord(args, "up");
+    //     cmds.RunUpStage(options);
+    // })
+    // .WithParsed<DestroyOptions>(options =>
+    // {
+    //     options.SetArgumentsAndStripCommandWord(args, "destroy");
+    //     if(null != options.args)
+    //         options.SetArgumentsAndStripCommandWord(options.args, "down");
+    //     cmds.RunDestroyStage(options);
+    // })
+    // .WithParsed<StackOptions>(options =>
+    // {
+    //     options.SetArgumentsAndStripCommandWord(args, "stack");
+    //     cmds.RunStackStage(options);
+    // })
+    .WithParsed<ShowOptions>(options =>
     {
-        options.SetArgumentsAndStripCommandWord(args, "up");
-        cmds.RunUpStage(options);
+        options.SetArgumentsAndStripCommandWord(args, "show");
+        var stacks = PulumiModel.GetStackHierarchy("soxes", options.StackName).GetAwaiter().GetResult();
+        cmds.ShowViaSpectre(stacks); 
     })
-    .WithParsed<DestroyOptions>(options =>
-    {
-        options.SetArgumentsAndStripCommandWord(args, "destroy");
-        if(null != options.args)
-            options.SetArgumentsAndStripCommandWord(options.args, "down");
-        cmds.RunDestroyStage(options);
-    })
-    .WithParsed<StackOptions>(options =>
-    {
-        options.SetArgumentsAndStripCommandWord(args, "stack");
-        cmds.RunStackStage(options);
-    })
-    .WithParsed<ShowOptions>(options => { cmds.ShowViaSpectre(); })
     ;

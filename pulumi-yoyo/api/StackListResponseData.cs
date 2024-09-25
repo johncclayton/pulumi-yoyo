@@ -3,5 +3,5 @@
 public record StackListResponseData
 (
     List<StackData> Stacks,
-    string ContinuationToken
+    string? ContinuationToken
 );

@@ -5,7 +5,6 @@
     <RootNamespace>pulumi_yoyo</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TargetFrameworks>net7.0;net8.0;net6.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>yoyo</ToolCommandName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -13,6 +12,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.6</Version>
     <Description>Yoyo - bring your Pulumi stacks up and down in one go, as a unit</Description>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

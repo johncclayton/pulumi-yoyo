@@ -4,163 +4,172 @@ using pulumi_yoyo.process;
 using QuikGraph;
 using QuikGraph.Algorithms.Search;
 using Spectre.Console;
-using System.Linq;
 
 namespace pulumi_yoyo;
 
 public class WithPulumiCommands
 {
     private readonly ConfigurationIterator _commandIterator;
-    private readonly IList<StackConfig> _execList;
+    // private readonly IList<StackConfig> _execList;
 
     public WithPulumiCommands(ProjectConfiguration projectConfig)
     {
         _commandIterator = new ConfigurationIterator(projectConfig);
-        _execList = _commandIterator.GetHierarchyAsExecutionList();
+        // _execList = _commandIterator.GetConfigurationHierarchyAsExecutionList();
     }
 
-    public int RunPreviewStage(PreviewOptions options)
-    {
-        return RunEach(GetCommands(Stage.Preview, options), options);
-    }
+    // public int RunPreviewStage(PreviewOptions options)
+    // {
+    //     return RunEach(GetCommands(Stage.Preview, options), options);
+    // }
+    //
+    // public int RunUpStage(UpOptions options)
+    // {
+    //     return RunEach(GetCommands(Stage.Up, options), options);
+    // }
+    //
+    // public int RunStackStage(StackOptions options)
+    // {
+    //     return RunEach(GetCommands(Stage.Stack, options), options);
+    // }
+    //
+    // public int RunDestroyStage(DestroyOptions options)
+    // {
+    //     return RunEach(GetCommands(Stage.Destroy, options), options, true);
+    // }
 
-    public int RunUpStage(UpOptions options)
-    {
-        return RunEach(GetCommands(Stage.Up, options), options);
-    }
+    // private async Task<int> RunEach(IEnumerable<RunnableFactory.ProcessWrapper?> getCommands, Options options, bool reverse = false)
+    // {
+    //     var processWrappers = reverse ? getCommands.Reverse() : getCommands;
+    //
+    //     var startAtStack = options.FromStack;
+    //     foreach (var command in processWrappers)
+    //     {
+    //         if (null != startAtStack && command.process.Stack?.ShortName != startAtStack) continue;
+    //
+    //         startAtStack = null;
+    //
+    //         if (options.DryRun)
+    //         {
+    //             Console.WriteLine($"Would run command: {command.process}");
+    //         }
+    //         else
+    //         {
+    //             command.process.AddOptionsToEnvironment(options);
+    //
+    //             command.process.Start();
+    //             command.process.WaitForExit();
+    //
+    //             if (command.process.ExitCode != (int)ExitCodeMeaning.Success)
+    //             {
+    //                 Console.WriteLine($"Error running command: {command}");
+    //                 return command.process.ExitCode;
+    //             }
+    //         }
+    //
+    //         // if this is the "to" stack, stop here...
+    //         if (null != options.ToStack && command.process.Stack?.ShortName == options.ToStack) break;
+    //     }
+    //
+    //     return 0;
+    // }
 
-    public int RunStackStage(StackOptions options)
-    {
-        return RunEach(GetCommands(Stage.Stack, options), options);
-    }
-
-    public int RunDestroyStage(DestroyOptions options)
-    {
-        return RunEach(GetCommands(Stage.Destroy, options), options, true);
-    }
-
-    private int RunEach(IEnumerable<RunnableFactory.ProcessWrapper> getCommands, Options options, bool reverse = false)
-    {
-        var processWrappers = reverse ? getCommands.Reverse() : getCommands;
-
-        var startAtStack = options.FromStack;
-        foreach (var command in processWrappers)
-        {
-            if (null != startAtStack && command.process.Stack?.ShortName != startAtStack) continue;
-
-            startAtStack = null;
-
-            if (options.DryRun)
-            {
-                Console.WriteLine($"Would run command: {command.process}");
-            }
-            else
-            {
-                command.process.AddOptionsToEnvironment(options);
-
-                command.process.Start();
-                command.process.WaitForExit();
-
-                if (command.process.ExitCode != (int)ExitCodeMeaning.Success)
-                {
-                    Console.WriteLine($"Error running command: {command}");
-                    return command.process.ExitCode;
-                }
-            }
-
-            // if this is the "to" stack, stop here...
-            if (null != options.ToStack && command.process.Stack?.ShortName == options.ToStack) break;
-        }
-
-        return 0;
-    }
-
-    public IEnumerable<RunnableFactory.ProcessWrapper> GetCommands(Stage stage, Options options)
-    {
-        IList<StackConfig> stacksToProcess = _execList;
-        
-        // if we find -s or --stack - the user wants just one specific stack, 
-        // and they might use the name of a yoyo stack, in which case replace it with the name 
-        // of the real stack and ONLY use this stack. 
-        var stackTarget = StripStackTargetFromCommandLineArguments(stage, options);
-        if (stackTarget != null)
-        {
-            stacksToProcess = new List<StackConfig>() { stackTarget };
-        }
-        
-        foreach (var stack in stacksToProcess)
-        {
-            var workingDirectory = _commandIterator.Configuration.DirectoryPathForStack(stack);
-
-            var pulumiArgs = new List<string>();
-            switch (stage)
-            {
-                case Stage.Stack:
-                    pulumiArgs.AddRange(new[] { "stack" });
-                    break;
-                case Stage.Preview:
-                    pulumiArgs.AddRange(new[] { "preview" });
-                    break;
-                case Stage.Up:
-                    pulumiArgs.AddRange(new[] { "up", "--yes" });
-                    break;
-                case Stage.Destroy:
-                    pulumiArgs.AddRange(new[] { "destroy", "--yes" });
-                    break;
-            }
-
-            // by default, create a pulumi command.
-            pulumiArgs.AddRange(new[] { "-s", $"{stack.FullStackName}", "--non-interactive" });
-            // now jam on all the other args the user specified... here's hoping. 
-            if (null != options.args)
-            {
-                pulumiArgs.AddRange(options.args);
-            }
-            
-            var pulumiTask = RunnableFactory.CreatePulumiProcess(workingDirectory, pulumiArgs, msg =>
-            {
-                Console.WriteLine(msg);
-                return true;
-            }, msg =>
-            {
-                Console.WriteLine(msg);
-                return false;
-            });
-
-            pulumiTask.AddStackAndStageToEnvironmentVariables(stack, stage);
-
-            IProcess actualTask;
-
-            // check the yoyo configuration for the pre and post scripts.  If they exist, then we need to run them
-            // as well, and then we use a LinkedProcess to chain them together.
-            (var exists, var preScriptPath) = PreScript(stack, stage);
-            if (exists && options.UsePreStageScripts)
-            {
-                var preTask = RunnableFactory.CreateScriptProcess(preScriptPath, workingDirectory,
-                    new[] { preScriptPath }, msg =>
-                    {
-                        Console.WriteLine(msg);
-                        return true;
-                    }, msg =>
-                    {
-                        Console.WriteLine(msg);
-                        return false;
-                    });
-
-                preTask.AddStackAndStageToEnvironmentVariables(stack, stage);
-
-                actualTask = new LinkedProcess(preTask, pulumiTask);
-            }
-            else
-            {
-                actualTask = pulumiTask;
-            }
-
-            yield return new RunnableFactory.ProcessWrapper(actualTask, true);
-        }
-    }
+    // public async IList<RunnableFactory.ProcessWrapper>? GetCommands(Stage stage, Options options)
+    // {
+    //     // IList<StackConfig> stacksToProcess = _execList;
+    //
+    //     // extract target stack from the command line arguments
+    //     var stackTarget = StripStackTargetFromCommandLineArguments(stage, options);
+    //
+    //     // if we find an option to parse via Pulumi API, then the stack list if created
+    //     // based on an initial 'target' stack, as defined on the command line args with -s/--stack,
+    //     // then all its dependencies are added to the list of stacks to process.
+    //
+    //     IList<StackConfig>? stacksToProcess = null;
+    //     if(options.UsePulumiApi)
+    //     {
+    //         if(stackTarget is null)
+    //         {
+    //             Console.WriteLine("No stack target found in the command line arguments.  Cannot continue.");
+    //             return null;
+    //         }
+    //
+    //         stacksToProcess = await PulumiModel.GetStackHierarchy("soxes", stackTarget);
+    //     }
+    //     
+    //     foreach (var stack in stacksToProcess)
+    //     {
+    //         // var workingDirectory = _commandIterator.Configuration.DirectoryPathForStack(stack);
+    //         //
+    //         // var pulumiArgs = new List<string>();
+    //         // switch (stage)
+    //         // {
+    //         //     case Stage.Stack:
+    //         //         pulumiArgs.AddRange(new[] { "stack" });
+    //         //         break;
+    //         //     case Stage.Preview:
+    //         //         pulumiArgs.AddRange(new[] { "preview" });
+    //         //         break;
+    //         //     case Stage.Up:
+    //         //         pulumiArgs.AddRange(new[] { "up", "--yes" });
+    //         //         break;
+    //         //     case Stage.Destroy:
+    //         //         pulumiArgs.AddRange(new[] { "destroy", "--yes" });
+    //         //         break;
+    //         // }
+    //         //
+    //         // // by default, create a pulumi command.
+    //         // pulumiArgs.AddRange(new[] { "-s", $"{stack.FullStackName}", "--non-interactive" });
+    //         // // now jam on all the other args the user specified... here's hoping. 
+    //         // if (null != options.args)
+    //         // {
+    //         //     pulumiArgs.AddRange(options.args);
+    //         // }
+    //         //
+    //         // var pulumiTask = RunnableFactory.CreatePulumiProcess(workingDirectory, pulumiArgs, msg =>
+    //         // {
+    //         //     Console.WriteLine(msg);
+    //         //     return true;
+    //         // }, msg =>
+    //         // {
+    //         //     Console.WriteLine(msg);
+    //         //     return false;
+    //         // });
+    //         //
+    //         // pulumiTask.AddStackAndStageToEnvironmentVariables(stack, stage);
+    //         //
+    //         // IProcess actualTask;
+    //         //
+    //         // // check the yoyo configuration for the pre and post scripts.  If they exist, then we need to run them
+    //         // // as well, and then we use a LinkedProcess to chain them together.
+    //         // (var exists, var preScriptPath) = PreScript(stack, stage);
+    //         // if (exists && options.UsePreStageScripts)
+    //         // {
+    //         //     var preTask = RunnableFactory.CreateScriptProcess(preScriptPath, workingDirectory,
+    //         //         new[] { preScriptPath }, msg =>
+    //         //         {
+    //         //             Console.WriteLine(msg);
+    //         //             return true;
+    //         //         }, msg =>
+    //         //         {
+    //         //             Console.WriteLine(msg);
+    //         //             return false;
+    //         //         });
+    //         //
+    //         //     preTask.AddStackAndStageToEnvironmentVariables(stack, stage);
+    //         //
+    //         //     actualTask = new LinkedProcess(preTask, pulumiTask);
+    //         // }
+    //         // else
+    //         // {
+    //         //     actualTask = pulumiTask;
+    //         // }
+    //
+    //        // return new RunnableFactory.ProcessWrapper(actualTask, true);
+    //     }
+    // }
     
-    private StackConfig? StripStackTargetFromCommandLineArguments(Stage stage, Options options)
+    private string? StripStackTargetFromCommandLineArguments(Stage stage, Options options)
     {
         if (null == options.args) return null;
 
@@ -170,13 +179,12 @@ public class WithPulumiCommands
             var theVar = copiedArgs[index];
             if ((theVar == "-s" || theVar == "--stack") && index + 1 < copiedArgs.Length)
             {
-                var theStack = _execList.FirstOrDefault(s => s.ShortName == copiedArgs[index + 1]);
-                if (null != theStack)
-                {
-                    // now we adjust the options.args - to REMOVE the "-s" / "--stack" + arg part
-                    options.args = options.args.Where((val, idx) => idx != index && idx != index + 1).ToArray();
-                    return theStack;    
-                }
+                var stackName = copiedArgs[index + 1];
+                
+                // now we adjust the options.args - to REMOVE the "-s" / "--stack" + arg part
+                options.args = options.args.Where((val, idx) => idx != index && idx != index + 1).ToArray();
+                
+                return stackName;    
             }
         }
 
@@ -205,7 +213,7 @@ public class WithPulumiCommands
         return (false, string.Empty);
     }
 
-    public void ShowViaSpectre()
+    public void ShowViaSpectre(IList<StackConfig> stacks)
     {
         // show config as a hierarchy/tree in spectre
         var ruler = new Rule("[green]Project Graph[/]")
@@ -219,12 +227,12 @@ public class WithPulumiCommands
 
         IDictionary<string, TreeNode> theNodes = new Dictionary<string, TreeNode>();
 
-        var graph = _commandIterator.GetGraph();
+        var graph = ConfigurationIterator.GetGraph(stacks);
         var dfs = new DepthFirstSearchAlgorithm<string, Edge<string>>(graph);
         dfs.ExamineEdge += action =>
         {
-            var sourceConfig = _commandIterator.Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Source);
-            var targetConfig = _commandIterator.Configuration.Stacks.FirstOrDefault(x => x.ShortName == action.Target);
+            var sourceConfig = stacks.FirstOrDefault(x => x.ShortName == action.Source);
+            var targetConfig = stacks.FirstOrDefault(x => x.ShortName == action.Target);
 
             if (!theNodes.ContainsKey(action.Source))
                 theNodes[action.Source] = tree.AddNode($"{action.Source}: {sourceConfig?.FullStackName}");
@@ -239,5 +247,11 @@ public class WithPulumiCommands
         dfs.Compute();
 
         AnsiConsole.Write(tree);
+    }
+
+    public void RunCleanupStage(CleanupOptions options)
+    {
+        var results = PulumiModel.GetStackHierarchy("soxes", options.StackName).GetAwaiter().GetResult();
+        ShowViaSpectre(results);
     }
 }

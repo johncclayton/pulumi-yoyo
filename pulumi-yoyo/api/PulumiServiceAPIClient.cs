@@ -13,23 +13,32 @@ public class PulumiServiceApiClient
         PulumiAccessToken = accessToken ?? Environment.GetEnvironmentVariable("PULUMI_ACCESS_TOKEN");
     }
 
-    public async Task<StackListResponseData> GetAllStacksAsync(string? pulumiOrganization = null,
-                                                               string? continuationToken = null,
+    public async IAsyncEnumerable<List<StackData>> GetAllStacksAsync(string? pulumiOrganization = null,
                                                                string? projectNameFilter = null,
                                                                string? tagNameFilter = null)
     {
         var query = CreateRequest().AppendPathSegment("api/user/stacks");
-        
-        if(pulumiOrganization != null)
-            query = query.SetQueryParam("organization", pulumiOrganization);
-        if (projectNameFilter != null)
-            query = query.SetQueryParam("project", projectNameFilter);
-        if (tagNameFilter != null)
-            query = query.SetQueryParam("tagName", tagNameFilter);
-        if (continuationToken != null)
-            query = query.SetQueryParam("continuationToken", continuationToken);
+
+        string? continuationToken = null;
+
+        do
+        {
+            if(pulumiOrganization != null)
+                query = query.SetQueryParam("organization", pulumiOrganization);
+            if (projectNameFilter != null)
+                query = query.SetQueryParam("project", projectNameFilter);
+            if (tagNameFilter != null)
+                query = query.SetQueryParam("tagName", tagNameFilter);
+            if (continuationToken != null && continuationToken.Length > 0)
+                query = query.SetQueryParam("continuationToken", continuationToken);
             
-        return await query.GetJsonAsync<StackListResponseData>();
+            var response = await query.GetJsonAsync<StackListResponseData>();
+            
+            continuationToken = response.ContinuationToken;
+
+            yield return response.Stacks;
+
+        } while (continuationToken is { Length: > 0 });
     }
 
     public async Task<StackResponseData> GetStackAsync(string fullyQualifiedStackName)

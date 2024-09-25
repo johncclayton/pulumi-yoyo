@@ -11,7 +11,7 @@ public record StackData(
 {
     public string FullyQualifiedStackName => $"{OrgName}/{ProjectName}/{StackName}";
     public DateTime LastUpdateDateTime => new DateTime(1970, 1, 1).AddSeconds(LastUpdate);
-    
+
     public static StackData OrphanFromFullyQualifiedStackName(string fullyQualifiedStackName)
     {
         var parts = fullyQualifiedStackName.Split("/");

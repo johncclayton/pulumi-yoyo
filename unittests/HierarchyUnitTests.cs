@@ -47,7 +47,7 @@ public class HierarchyUnitTests
     {
         // fetch a hierarchy iterator, and iterate it - we are looking for a specific flow...
         var it = new ConfigurationIterator(_projectConfiguration ?? throw new InvalidOperationException());
-        var commands = it.GetHierarchyAsExecutionList();
+        var commands = it.GetConfigurationHierarchyAsExecutionList();
         
         Assert.Equal(4, commands.Count);
         

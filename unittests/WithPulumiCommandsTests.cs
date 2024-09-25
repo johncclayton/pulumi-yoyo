@@ -12,14 +12,14 @@ public class WithPulumiCommandsTests
         Assert.NotNull(_projectConfiguration);
     }
     
-    [InlineData(Stage.Preview, 4)]
-    [InlineData(Stage.Up, 4)]
-    [Theory]
-    public void Test_GetCommandsProducesAppropriateSeries(Stage theStage, int expectedCommandCount)
-    {
-        Options opts = new Options();
-        var commands = new WithPulumiCommands(_projectConfiguration!).GetCommands(theStage, opts).ToArray();
-        Assert.NotEmpty(commands);
-        Assert.Equal(expectedCommandCount, commands.Length);
-    }
+    // [InlineData(Stage.Preview, 4)]
+    // [InlineData(Stage.Up, 4)]
+    // [Theory]
+    // public void Test_GetCommandsProducesAppropriateSeries(Stage theStage, int expectedCommandCount)
+    // {
+    //     Options opts = new Options();
+    //     var commands = new WithPulumiCommands(_projectConfiguration!).GetCommands(theStage, opts).ToArray();
+    //     Assert.NotEmpty(commands);
+    //     Assert.Equal(expectedCommandCount, commands.Length);
+    // }
 }
