@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
 using pulumi_yoyo;
 using pulumi_yoyo.config;
 using Xunit.Abstractions;
@@ -36,6 +36,7 @@ public class HierarchyUnitTests
     public void TestFullPathResolutionFromConfiguration()
     {
         _projectConfiguration?.ResolveDefaultPathForRelativeReferences("c:\\monkey\\yoyo.json");
+        Debug.Assert(_projectConfiguration?.Stacks != null, "_projectConfiguration?.Stacks != null");
         var firstStack = _projectConfiguration?.Stacks.FirstOrDefault((x) => x.ShortName == "app");
         Assert.NotNull(firstStack);
         var fullPath = _projectConfiguration?.DirectoryPathForStack(firstStack!);

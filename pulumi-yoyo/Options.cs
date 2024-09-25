@@ -29,7 +29,7 @@ public class Options
     // [Option('a', "api", Required = false, Default = true, HelpText = "Use the pulumi API to obtain the stack hierarchy, rather than the configuration file.  Requires the use of '-s' to indicate which stack to start with.")]
     // public bool UsePulumiApi { get; set; }
     
-    [Option("pwsh", Required = false, Default = false, HelpText = "A PowerShell Core scriptblock or filename to run.")]
+    [Option("pwsh", Required = false, HelpText = "A PowerShell Core scriptblock or filename to run.")]
     public string? PwshScriptBlock { get; set; }
 
     public Options OverrideOptionsUsingEnv()
@@ -89,17 +89,17 @@ public class Options
 // {
 // }
 
-[Verb(name: "cleanup", isDefault: true, aliases: new string[] {"clean"}, HelpText = "Cleanup everything, force delete stacks - leave no traces behind")]
+[Verb(name: "cleanup", isDefault: false, aliases: new string[] {"clean"}, HelpText = "Cleanup everything, force delete stacks - leave no traces behind")]
 public class CleanupOptions : Options
 {
     [Option( 's', "stack", Required = true, HelpText = "The name of the stack to start the cleanup from")]
-    public required string StackName { get; set; }
+    public string StackName { get; set; }
 }
 
 [Verb(name: "show", isDefault: true, aliases: new string[] {"info"}, HelpText = "Show the project configuration")]
 public class ShowOptions : Options
 {
     [Option( 's', "stack", Required = true, HelpText = "The name of the stack to start the cleanup from")]
-    public required string StackName { get; set; }
+    public string StackName { get; set; }
 }
 

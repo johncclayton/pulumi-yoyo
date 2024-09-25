@@ -90,38 +90,43 @@ var parser = new Parser(settings =>
     settings.AutoHelp = true;
 });
 
-parser.ParseArguments<CleanupOptions, ShowOptions>(args)
-    .WithParsed<CleanupOptions>(options =>
-    {
-        options.SetArgumentsAndStripCommandWord(args, "cleanup");
-        cmds.RunCleanupStage(options);
-    })
-    // .WithParsed<PreviewOptions>(options =>
-    // {
-    //     options.SetArgumentsAndStripCommandWord(args, "preview");
-    //     cmds.RunPreviewStage(options);
-    // })
-    // .WithParsed<UpOptions>(options =>
-    // {
-    //     options.SetArgumentsAndStripCommandWord(args, "up");
-    //     cmds.RunUpStage(options);
-    // })
-    // .WithParsed<DestroyOptions>(options =>
-    // {
-    //     options.SetArgumentsAndStripCommandWord(args, "destroy");
-    //     if(null != options.args)
-    //         options.SetArgumentsAndStripCommandWord(options.args, "down");
-    //     cmds.RunDestroyStage(options);
-    // })
-    // .WithParsed<StackOptions>(options =>
-    // {
-    //     options.SetArgumentsAndStripCommandWord(args, "stack");
-    //     cmds.RunStackStage(options);
-    // })
-    .WithParsed<ShowOptions>(options =>
-    {
-        options.SetArgumentsAndStripCommandWord(args, "show");
-        var stacks = PulumiModel.GetStackHierarchy("soxes", options.StackName).GetAwaiter().GetResult();
-        cmds.ShowViaSpectre(stacks); 
-    })
-    ;
+{
+    parser.ParseArguments<CleanupOptions, ShowOptions>(args)
+        .WithParsed<CleanupOptions>(options =>
+        {
+            options.SetArgumentsAndStripCommandWord(args, "cleanup");
+            cmds.RunCleanupStage(options);
+        })
+        // .WithParsed<PreviewOptions>(options =>
+        // {
+        //     options.SetArgumentsAndStripCommandWord(args, "preview");
+        //     cmds.RunPreviewStage(options);
+        // })
+        // .WithParsed<UpOptions>(options =>
+        // {
+        //     options.SetArgumentsAndStripCommandWord(args, "up");
+        //     cmds.RunUpStage(options);
+        // })
+        // .WithParsed<DestroyOptions>(options =>
+        // {
+        //     options.SetArgumentsAndStripCommandWord(args, "destroy");
+        //     if(null != options.args)
+        //         options.SetArgumentsAndStripCommandWord(options.args, "down");
+        //     cmds.RunDestroyStage(options);
+        // })
+        // .WithParsed<StackOptions>(options =>
+        // {
+        //     options.SetArgumentsAndStripCommandWord(args, "stack");
+        //     cmds.RunStackStage(options);
+        // })
+        .WithParsed<ShowOptions>(options =>
+        {
+            options.SetArgumentsAndStripCommandWord(args, "show");
+            var stacks = PulumiModel.GetStackHierarchy("soxes", options.StackName).GetAwaiter().GetResult();
+            cmds.ShowViaSpectre(stacks); 
+        }).WithNotParsed(errors =>
+        {
+            Console.WriteLine("There was an error parsing the command line arguments.");
+        });
+        ;
+}
